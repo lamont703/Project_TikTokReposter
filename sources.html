@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Settings - TikTok Reposter Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Navigation Bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">📲 TikTok Reposter</h1>
+                    </div>
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html"
+                                class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="sources.html"
+                                class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Sources</a>
+                            <a href="repost-config.html"
+                                class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Repost
+                                Config</a>
+                            <a href="video-library.html"
+                                class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Video
+                                Library</a>
+                            <a href="agent-logs.html"
+                                class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Agent
+                                Logs</a>
+                            <a href="settings.html"
+                                class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button"
+                        class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+
+                <!-- Dark mode toggle -->
+                <div class="hidden md:block">
+                    <button id="dark-mode-toggle"
+                        class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="moon" class="h-5 w-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 dark:bg-gray-800">
+                <a href="index.html"
+                    class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="sources.html"
+                    class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium">Sources</a>
+                <a href="repost-config.html"
+                    class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Repost
+                    Config</a>
+                <a href="video-library.html"
+                    class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Video
+                    Library</a>
+                <a href="agent-logs.html"
+                    class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Agent
+                    Logs</a>
+                <a href="settings.html"
+                    class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Source Settings</h2>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">Configure TikTok accounts and hashtags to monitor</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Add New Source -->
+            <div class="lg:col-span-2">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Add New Source</h3>
+                    </div>
+                    <form class="p-6 space-y-6" id="source-form">
+                        <!-- Source Type -->
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Source Type</label>
+                            <div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="sourceType" value="username" class="sr-only" checked>
+                                    <div
+                                        class="p-3 text-center border-2 border-indigo-200 dark:border-indigo-800 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-700 selected-source">
+                                        <i data-lucide="user"
+                                            class="h-6 w-6 mx-auto text-indigo-600 dark:text-indigo-400"></i>
+                                        <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">Username</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="sourceType" value="hashtag" class="sr-only">
+                                    <div
+                                        class="p-3 text-center border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-700">
+                                        <i data-lucide="hash" class="h-6 w-6 mx-auto text-gray-400"></i>
+                                        <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">Hashtag</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="sourceType" value="trending" class="sr-only">
+                                    <div
+                                        class="p-3 text-center border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-700">
+                                        <i data-lucide="trending-up" class="h-6 w-6 mx-auto text-gray-400"></i>
+                                        <p class="mt-1 text-sm font-medium text-gray-900 dark:text-white">Trending</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Source Input -->
+                        <div>
+                            <label for="source-input"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <span id="source-label">TikTok Username</span>
+                            </label>
+                            <div class="mt-1 relative">
+                                <input type="text" id="source-input" name="source"
+                                    class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                                    placeholder="@techguru123" required>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <i data-lucide="at-sign" class="h-5 w-5 text-gray-400" id="source-icon"></i>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" id="source-help">Enter a TikTok
+                                username to monitor</p>
+                        </div>
+
+                        <!-- Scraping Frequency -->
+                        <div>
+                            <label for="frequency"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Scraping
+                                Frequency</label>
+                            <select id="frequency" name="frequency"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                <option value="hourly">Every Hour</option>
+                                <option value="2hours">Every 2 Hours</option>
+                                <option value="4hours">Every 4 Hours</option>
+                                <option value="6hours">Every 6 Hours</option>
+                                <option value="12hours">Every 12 Hours</option>
+                                <option value="daily" selected>Daily</option>
+                                <option value="custom">Custom CRON</option>
+                            </select>
+                        </div>
+
+                        <!-- Custom CRON -->
+                        <div id="custom-cron" class="hidden">
+                            <label for="cron-expression"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">CRON
+                                Expression</label>
+                            <input type="text" id="cron-expression" name="cronExpression"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                                placeholder="0 */6 * * *">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Use standard CRON format. Example:
+                                "0 */6 * * *" for every 6 hours</p>
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-4">Advanced Options</h4>
+
+                            <div class="space-y-4">
+                                <!-- Remove Watermarks -->
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label for="remove-watermarks"
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-300">Remove
+                                            Watermarks</label>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Automatically remove TikTok
+                                            watermarks from downloaded videos</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="remove-watermarks" name="removeWatermarks" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Video Quality -->
+                                <div>
+                                    <label for="video-quality"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Video
+                                        Quality</label>
+                                    <select id="video-quality" name="videoQuality"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <option value="best">Best Available</option>
+                                        <option value="1080p">1080p</option>
+                                        <option value="720p">720p</option>
+                                        <option value="480p">480p</option>
+                                    </select>
+                                </div>
+
+                                <!-- Min Views Filter -->
+                                <div>
+                                    <label for="min-views"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Minimum
+                                        Views</label>
+                                    <input type="number" id="min-views" name="minViews" value="10000"
+                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Only scrape videos with at
+                                        least this many views</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <button type="submit"
+                                class="btn-primary px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Add Source
+                            </button>
+                            <button type="button"
+                                class="btn-secondary px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                                Test Source
+                            </button>
+                            <button type="reset"
+                                class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-4 py-2 text-sm font-medium">
+                                Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Active Sources -->
+            <div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Active Sources</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">12 sources configured</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4 custom-scrollbar overflow-y-auto max-h-96">
+                            <!-- Source Item 1 -->
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <i data-lucide="user" class="h-4 w-4 text-indigo-600 dark:text-indigo-400"></i>
+                                        <span class="font-medium text-gray-900 dark:text-white">@techguru123</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="h-2 w-2 bg-green-400 rounded-full"></span>
+                                        <span class="text-xs text-green-600 dark:text-green-400">Active</span>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                    <p>Frequency: Every 2 hours</p>
+                                    <p>Last scraped: 45 minutes ago</p>
+                                    <p>Videos found: 23</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button
+                                        class="text-indigo-600 hover:text-indigo-500 text-xs font-medium">Edit</button>
+                                    <button class="text-red-600 hover:text-red-500 text-xs font-medium">Delete</button>
+                                    <button class="text-gray-600 hover:text-gray-500 text-xs font-medium">Pause</button>
+                                </div>
+                            </div>
+
+                            <!-- Source Item 2 -->
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <i data-lucide="hash" class="h-4 w-4 text-purple-600 dark:text-purple-400"></i>
+                                        <span class="font-medium text-gray-900 dark:text-white">#technology</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="h-2 w-2 bg-green-400 rounded-full"></span>
+                                        <span class="text-xs text-green-600 dark:text-green-400">Active</span>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                    <p>Frequency: Every 4 hours</p>
+                                    <p>Last scraped: 2 hours ago</p>
+                                    <p>Videos found: 156</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button
+                                        class="text-indigo-600 hover:text-indigo-500 text-xs font-medium">Edit</button>
+                                    <button class="text-red-600 hover:text-red-500 text-xs font-medium">Delete</button>
+                                    <button class="text-gray-600 hover:text-gray-500 text-xs font-medium">Pause</button>
+                                </div>
+                            </div>
+
+                            <!-- Source Item 3 -->
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <i data-lucide="user" class="h-4 w-4 text-indigo-600 dark:text-indigo-400"></i>
+                                        <span class="font-medium text-gray-900 dark:text-white">@diymaster</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="h-2 w-2 bg-yellow-400 rounded-full"></span>
+                                        <span class="text-xs text-yellow-600 dark:text-yellow-400">Paused</span>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                    <p>Frequency: Daily</p>
+                                    <p>Last scraped: 1 day ago</p>
+                                    <p>Videos found: 8</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button
+                                        class="text-indigo-600 hover:text-indigo-500 text-xs font-medium">Edit</button>
+                                    <button class="text-red-600 hover:text-red-500 text-xs font-medium">Delete</button>
+                                    <button
+                                        class="text-green-600 hover:text-green-500 text-xs font-medium">Resume</button>
+                                </div>
+                            </div>
+
+                            <!-- Source Item 4 -->
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <i data-lucide="trending-up"
+                                            class="h-4 w-4 text-orange-600 dark:text-orange-400"></i>
+                                        <span class="font-medium text-gray-900 dark:text-white">Trending</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="h-2 w-2 bg-green-400 rounded-full"></span>
+                                        <span class="text-xs text-green-600 dark:text-green-400">Active</span>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                    <p>Frequency: Every hour</p>
+                                    <p>Last scraped: 12 minutes ago</p>
+                                    <p>Videos found: 89</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button
+                                        class="text-indigo-600 hover:text-indigo-500 text-xs font-medium">Edit</button>
+                                    <button class="text-red-600 hover:text-red-500 text-xs font-medium">Delete</button>
+                                    <button class="text-gray-600 hover:text-gray-500 text-xs font-medium">Pause</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Source type handling
+        document.querySelectorAll('input[name="sourceType"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                // Update visual selection
+                document.querySelectorAll('input[name="sourceType"]').forEach(r => {
+                    const div = r.nextElementSibling;
+                    if (r.checked) {
+                        div.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900', 'selected-source');
+                        div.classList.remove('border-gray-200', 'dark:border-gray-700');
+                        div.querySelector('i').classList.add('text-indigo-600', 'dark:text-indigo-400');
+                        div.querySelector('i').classList.remove('text-gray-400');
+                    } else {
+                        div.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900', 'selected-source');
+                        div.classList.add('border-gray-200', 'dark:border-gray-700');
+                        div.querySelector('i').classList.remove('text-indigo-600', 'dark:text-indigo-400');
+                        div.querySelector('i').classList.add('text-gray-400');
+                    }
+                });
+
+                // Update form fields based on selection
+                const sourceInput = document.getElementById('source-input');
+                const sourceLabel = document.getElementById('source-label');
+                const sourceHelp = document.getElementById('source-help');
+                const sourceIcon = document.getElementById('source-icon');
+
+                switch (this.value) {
+                    case 'username':
+                        sourceLabel.textContent = 'TikTok Username';
+                        sourceInput.placeholder = '@techguru123';
+                        sourceHelp.textContent = 'Enter a TikTok username to monitor';
+                        sourceIcon.setAttribute('data-lucide', 'at-sign');
+                        break;
+                    case 'hashtag':
+                        sourceLabel.textContent = 'Hashtag';
+                        sourceInput.placeholder = '#technology';
+                        sourceHelp.textContent = 'Enter a hashtag to monitor (with or without #)';
+                        sourceIcon.setAttribute('data-lucide', 'hash');
+                        break;
+                    case 'trending':
+                        sourceLabel.textContent = 'Category';
+                        sourceInput.placeholder = 'technology, gaming, education';
+                        sourceHelp.textContent = 'Enter categories for trending videos (optional)';
+                        sourceIcon.setAttribute('data-lucide', 'trending-up');
+                        break;
+                }
+                lucide.createIcons();
+            });
+        });
+
+        // Frequency handling
+        document.getElementById('frequency').addEventListener('change', function () {
+            const customCron = document.getElementById('custom-cron');
+            if (this.value === 'custom') {
+                customCron.classList.remove('hidden');
+            } else {
+                customCron.classList.add('hidden');
+            }
+        });
+
+        // Form submission
+        document.getElementById('source-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            if (TikTokDashboard.validateForm(this)) {
+                TikTokDashboard.showNotification('Source added successfully!', 'success');
+
+                // Simulate adding to active sources
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                TikTokDashboard.showNotification('Please fill in all required fields', 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

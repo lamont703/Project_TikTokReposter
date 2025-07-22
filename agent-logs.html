@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Logs - TikTok Reposter Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Navigation Bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">📲 TikTok Reposter</h1>
+                    </div>
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="sources.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Sources</a>
+                            <a href="repost-config.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Repost Config</a>
+                            <a href="video-library.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Video Library</a>
+                            <a href="agent-logs.html" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Agent Logs</a>
+                            <a href="settings.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+                
+                <!-- Dark mode toggle -->
+                <div class="hidden md:block">
+                    <button id="dark-mode-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="moon" class="h-5 w-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 dark:bg-gray-800">
+                <a href="index.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="sources.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Sources</a>
+                <a href="repost-config.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Repost Config</a>
+                <a href="video-library.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Video Library</a>
+                <a href="agent-logs.html" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium">Agent Logs</a>
+                <a href="settings.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Agent Logs</h2>
+                    <p class="mt-2 text-gray-600 dark:text-gray-300">Monitor all agent activities and system events</p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex space-x-3">
+                    <button class="btn-secondary px-4 py-2 rounded-md text-sm font-medium">
+                        <i data-lucide="download" class="h-4 w-4 mr-2 inline"></i>
+                        Export Logs
+                    </button>
+                    <button class="btn-primary px-4 py-2 rounded-md text-sm font-medium">
+                        <i data-lucide="refresh-cw" class="h-4 w-4 mr-2 inline"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Filters Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filters</h3>
+                        
+                        <!-- Log Level Filter -->
+                        <div class="mb-6">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Log Level</label>
+                            <div class="mt-2 space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Info</span>
+                                    <span class="ml-auto text-xs text-gray-500 dark:text-gray-400">(1,234)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Success</span>
+                                    <span class="ml-auto text-xs text-gray-500 dark:text-gray-400">(856)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Warning</span>
+                                    <span class="ml-auto text-xs text-gray-500 dark:text-gray-400">(23)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Error</span>
+                                    <span class="ml-auto text-xs text-gray-500 dark:text-gray-400">(7)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Agent Filter -->
+                        <div class="mb-6">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Agent Type</label>
+                            <div class="mt-2 space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Scraper</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Processor</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Publisher</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Scheduler</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Time Range -->
+                        <div class="mb-6">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Time Range</label>
+                            <select class="mt-2 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                <option>Last Hour</option>
+                                <option selected>Last 24 Hours</option>
+                                <option>Last 7 Days</option>
+                                <option>Last 30 Days</option>
+                                <option>Custom Range</option>
+                            </select>
+                        </div>
+
+                        <!-- Search -->
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Search Logs</label>
+                            <input type="text" placeholder="Search in logs..." 
+                                   class="mt-2 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                        </div>
+                    </div>
+
+                    <!-- Agent Status Summary -->
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-4">Agent Status</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">Scraper #1</span>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-green-400 rounded-full mr-2"></span>
+                                    <span class="text-xs text-green-600 dark:text-green-400">Active</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">Scraper #2</span>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-green-400 rounded-full mr-2"></span>
+                                    <span class="text-xs text-green-600 dark:text-green-400">Active</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">Processor</span>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-blue-400 rounded-full mr-2"></span>
+                                    <span class="text-xs text-blue-600 dark:text-blue-400">Idle</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-300">Publisher</span>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-yellow-400 rounded-full mr-2"></span>
+                                    <span class="text-xs text-yellow-600 dark:text-yellow-400">Busy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Timeline -->
+            <div class="lg:col-span-3">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Activity Timeline</h3>
+                            <div class="flex items-center space-x-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">Auto-refresh</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="space-y-6 custom-scrollbar overflow-y-auto" style="max-height: 800px;">
+                            <!-- Log Entry 1 - Current Activity -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                            <div class="h-3 w-3 bg-green-600 dark:bg-green-400 rounded-full animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 mr-2">
+                                                        LIVE
+                                                    </span>
+                                                    Scraper Agent #1 - Processing hashtag #technology
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    Currently scraping trending videos from #technology hashtag. Found 13 new videos so far.
+                                                </p>
+                                                <div class="mt-2 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                    <div class="bg-green-600 h-2 rounded-full animate-pulse" style="width: 65%"></div>
+                                                </div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Progress: 13/20 videos processed</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Now</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: scraper-1</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Log Entry 2 - Success -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                            <i data-lucide="check" class="h-5 w-5 text-green-600 dark:text-green-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    Successfully posted video to Instagram Reels
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    Video ID: vid_123456 | Title: "Amazing tech demo goes viral" | Account: @my_repost_account
+                                                </p>
+                                                <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                                                    <span>Duration: 45s</span>
+                                                    <span>Original views: 2.1M</span>
+                                                    <span>Source: @techguru123</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">2 hours ago</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: publisher</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Log Entry 3 - Info -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                            <i data-lucide="info" class="h-5 w-5 text-blue-600 dark:text-blue-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    Video processing completed
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    Watermark removed, quality enhanced, and scheduled for reposting across 2 platforms
+                                                </p>
+                                                <div class="mt-2 flex flex-wrap gap-1">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200">
+                                                        Instagram
+                                                    </span>
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                                        YouTube
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">3 hours ago</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: processor</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Log Entry 4 - Warning -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                                            <i data-lucide="alert-triangle" class="h-5 w-5 text-yellow-600 dark:text-yellow-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    Rate limit approaching for Instagram API
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    API calls: 4,850/5,000 per hour. Consider reducing posting frequency or upgrading API tier.
+                                                </p>
+                                                <div class="mt-2">
+                                                    <button class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+                                                        View API Usage →
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">4 hours ago</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: publisher</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Log Entry 5 - Error -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+                                            <i data-lucide="x-circle" class="h-5 w-5 text-red-600 dark:text-red-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    Failed to download video from @dancequeen
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    Error: HTTP 403 - Video may be private or restricted. Retrying in 5 minutes.
+                                                </p>
+                                                <div class="mt-2 bg-red-50 dark:bg-red-900 p-3 rounded-md">
+                                                    <pre class="text-xs text-red-800 dark:text-red-200 font-mono overflow-x-auto">
+Error: VideoDownloadError
+  at downloadVideo (scraper.js:145)
+  at processVideo (processor.js:67)
+  at Object.scrapeSource (index.js:23)
+Stack trace: [View Details]</pre>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <button class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 mr-4">
+                                                        Retry Now
+                                                    </button>
+                                                    <button class="text-xs text-red-600 dark:text-red-400 hover:text-red-500">
+                                                        Skip Video
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">6 hours ago</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: scraper-2</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Log Entry 6 - Batch Operation -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                            <i data-lucide="package" class="h-5 w-5 text-green-600 dark:text-green-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    Batch processing completed for trending content
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    Processed 23 videos from trending sources. 20 successfully queued, 2 skipped, 1 failed.
+                                                </p>
+                                                <div class="mt-2 grid grid-cols-3 gap-4 text-xs">
+                                                    <div>
+                                                        <span class="text-green-600 dark:text-green-400 font-medium">20</span>
+                                                        <span class="text-gray-500 dark:text-gray-400"> successful</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="text-yellow-600 dark:text-yellow-400 font-medium">2</span>
+                                                        <span class="text-gray-500 dark:text-gray-400"> skipped</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="text-red-600 dark:text-red-400 font-medium">1</span>
+                                                        <span class="text-gray-500 dark:text-gray-400"> failed</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">8 hours ago</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: scheduler</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Log Entry 7 - System Event -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                                            <i data-lucide="settings" class="h-5 w-5 text-purple-600 dark:text-purple-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    System configuration updated
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    User updated repost configuration: Added Facebook as target platform, increased frequency to 3x/day
+                                                </p>
+                                                <div class="mt-2">
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">Changes:</span>
+                                                    <div class="mt-1 space-y-1">
+                                                        <div class="text-xs">
+                                                            <span class="text-green-600 dark:text-green-400">+</span>
+                                                            <span class="text-gray-600 dark:text-gray-300"> Facebook platform enabled</span>
+                                                        </div>
+                                                        <div class="text-xs">
+                                                            <span class="text-blue-600 dark:text-blue-400">~</span>
+                                                            <span class="text-gray-600 dark:text-gray-300"> Posting frequency: 2x/day → 3x/day</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">12 hours ago</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">User: admin</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Log Entry 8 - Scheduled Task -->
+                            <div class="relative">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                            <i data-lucide="clock" class="h-5 w-5 text-blue-600 dark:text-blue-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    Daily source scan initiated
+                                                </p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                    Scheduled scan started for 12 configured sources. Estimated completion time: 45 minutes.
+                                                </p>
+                                                <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                                                    <span>Sources: 12 active</span>
+                                                    <span>Last run: 24h ago</span>
+                                                    <span>Avg. videos found: 47</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">1 day ago</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: scheduler</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More / Pagination -->
+                <div class="mt-6 text-center">
+                    <button class="btn-secondary px-6 py-2 rounded-md text-sm font-medium">
+                        Load More Logs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Auto-refresh functionality
+        let autoRefreshInterval;
+        const autoRefreshCheckbox = document.querySelector('input[type="checkbox"]:checked');
+        
+        if (autoRefreshCheckbox) {
+            autoRefreshCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    // Start auto-refresh every 10 seconds
+                    autoRefreshInterval = setInterval(() => {
+                        // Simulate adding new log entry at the top
+                        const timeline = document.querySelector('.space-y-6.custom-scrollbar');
+                        if (Math.random() > 0.7) { // 30% chance of new log
+                            const newEntry = createMockLogEntry();
+                            timeline.insertBefore(newEntry, timeline.firstChild);
+                            
+                            // Show notification
+                            TikTokDashboard.showNotification('New activity logged', 'info');
+                        }
+                    }, 10000);
+                } else {
+                    clearInterval(autoRefreshInterval);
+                }
+            });
+        }
+
+        function createMockLogEntry() {
+            const activities = [
+                'New video downloaded from @creator123',
+                'Video processing started',
+                'Scheduled post published successfully',
+                'API quota check completed'
+            ];
+            
+            const activity = activities[Math.floor(Math.random() * activities.length)];
+            
+            const entry = document.createElement('div');
+            entry.className = 'relative';
+            entry.innerHTML = `
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                            <i data-lucide="info" class="h-5 w-5 text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                    ${activity}
+                                </p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                    Auto-generated activity log entry for demonstration
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Just now</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Agent: system</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Re-initialize Lucide icons for the new element
+            setTimeout(() => lucide.createIcons(), 100);
+            
+            return entry;
+        }
+
+        // Filter functionality
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Simulate filtering (in real app, this would filter the actual logs)
+                console.log('Filter applied:', this.nextElementSibling.textContent);
+            });
+        });
+
+        // Retry failed operations
+        document.querySelectorAll('button').forEach(button => {
+            if (button.textContent.includes('Retry')) {
+                button.addEventListener('click', function() {
+                    TikTokDashboard.showNotification('Retrying operation...', 'info');
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

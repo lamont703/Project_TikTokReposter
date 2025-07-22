@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repost Configuration - TikTok Reposter Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Navigation Bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">📲 TikTok Reposter</h1>
+                    </div>
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="sources.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Sources</a>
+                            <a href="repost-config.html" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Repost Config</a>
+                            <a href="video-library.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Video Library</a>
+                            <a href="agent-logs.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Agent Logs</a>
+                            <a href="settings.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+                
+                <!-- Dark mode toggle -->
+                <div class="hidden md:block">
+                    <button id="dark-mode-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="moon" class="h-5 w-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 dark:bg-gray-800">
+                <a href="index.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="sources.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Sources</a>
+                <a href="repost-config.html" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium">Repost Config</a>
+                <a href="video-library.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Video Library</a>
+                <a href="agent-logs.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Agent Logs</a>
+                <a href="settings.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Repost Configuration</h2>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">Configure how and where videos are reposted</p>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Target Platforms -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Target Platforms</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select which platforms to repost videos to</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Instagram Reels -->
+                        <div class="relative">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="platforms" value="instagram" class="sr-only platform-checkbox" checked>
+                                <div class="platform-card border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors selected-platform">
+                                    <div class="h-12 w-12 mx-auto mb-4 rounded-lg flex items-center justify-center platform-instagram">
+                                        <i data-lucide="instagram" class="h-6 w-6 text-white"></i>
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">Instagram Reels</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Short vertical videos</p>
+                                </div>
+                            </label>
+                            <div class="platform-settings mt-4">
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Account</label>
+                                        <select class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                            <option>@my_repost_account</option>
+                                            <option>@alternative_account</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Max per day</label>
+                                        <input type="number" value="3" min="1" max="20" class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- YouTube Shorts -->
+                        <div class="relative">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="platforms" value="youtube" class="sr-only platform-checkbox" checked>
+                                <div class="platform-card border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors selected-platform">
+                                    <div class="h-12 w-12 mx-auto mb-4 rounded-lg flex items-center justify-center platform-youtube">
+                                        <i data-lucide="youtube" class="h-6 w-6 text-white"></i>
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">YouTube Shorts</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Short form content</p>
+                                </div>
+                            </label>
+                            <div class="platform-settings mt-4">
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Channel</label>
+                                        <select class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                            <option>TechRepost Channel</option>
+                                            <option>Secondary Channel</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Max per day</label>
+                                        <input type="number" value="5" min="1" max="20" class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Facebook -->
+                        <div class="relative">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="platforms" value="facebook" class="sr-only platform-checkbox">
+                                <div class="platform-card border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors">
+                                    <div class="h-12 w-12 mx-auto mb-4 rounded-lg flex items-center justify-center platform-facebook">
+                                        <i data-lucide="facebook" class="h-6 w-6 text-white"></i>
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">Facebook</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Page posts</p>
+                                </div>
+                            </label>
+                            <div class="platform-settings mt-4 hidden">
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Page</label>
+                                        <select class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                            <option>My Business Page</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Max per day</label>
+                                        <input type="number" value="2" min="1" max="20" class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TikTok Alt Account -->
+                        <div class="relative">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="platforms" value="tiktok" class="sr-only platform-checkbox">
+                                <div class="platform-card border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors">
+                                    <div class="h-12 w-12 mx-auto mb-4 rounded-lg flex items-center justify-center platform-tiktok">
+                                        <i data-lucide="music" class="h-6 w-6 text-white"></i>
+                                    </div>
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white">TikTok Alt</h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Alternative account</p>
+                                </div>
+                            </label>
+                            <div class="platform-settings mt-4 hidden">
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Account</label>
+                                        <select class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                            <option>@alt_account</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 dark:text-gray-300">Max per day</label>
+                                        <input type="number" value="8" min="1" max="20" class="mt-1 block w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduling Options -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Scheduling Options</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Configure when posts are scheduled</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Schedule Type -->
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Schedule Type</label>
+                            <div class="mt-3 space-y-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="scheduleType" value="interval" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600" checked>
+                                    <span class="ml-3 text-sm text-gray-900 dark:text-white">Regular Intervals</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="scheduleType" value="specific" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600">
+                                    <span class="ml-3 text-sm text-gray-900 dark:text-white">Specific Time Slots</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="scheduleType" value="optimal" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600">
+                                    <span class="ml-3 text-sm text-gray-900 dark:text-white">AI Optimal Times</span>
+                                </label>
+                            </div>
+
+                            <!-- Interval Settings -->
+                            <div id="interval-settings" class="mt-4 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Post Frequency</label>
+                                    <select class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <option value="2hours">Every 2 hours</option>
+                                        <option value="3hours" selected>Every 3 hours</option>
+                                        <option value="4hours">Every 4 hours</option>
+                                        <option value="6hours">Every 6 hours</option>
+                                        <option value="8hours">Every 8 hours</option>
+                                        <option value="12hours">Every 12 hours</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Active Hours</label>
+                                    <div class="mt-2 grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="text-xs text-gray-500 dark:text-gray-400">Start Time</label>
+                                            <input type="time" value="08:00" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-gray-500 dark:text-gray-400">End Time</label>
+                                            <input type="time" value="22:00" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Specific Times Settings -->
+                            <div id="specific-settings" class="mt-4 space-y-4 hidden">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Daily Time Slots</label>
+                                    <div class="mt-2 space-y-2">
+                                        <input type="time" value="09:00" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <input type="time" value="14:00" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <input type="time" value="19:00" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                    <button type="button" class="mt-2 text-sm text-indigo-600 hover:text-indigo-500">+ Add Time Slot</button>
+                                </div>
+                            </div>
+
+                            <!-- AI Optimal Settings -->
+                            <div id="optimal-settings" class="mt-4 space-y-4 hidden">
+                                <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                                    <div class="flex items-start">
+                                        <i data-lucide="brain" class="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5"></i>
+                                        <div class="ml-3">
+                                            <h4 class="text-sm font-medium text-blue-900 dark:text-blue-100">AI-Powered Scheduling</h4>
+                                            <p class="text-sm text-blue-700 dark:text-blue-300">Our AI will analyze engagement patterns and schedule posts at optimal times for maximum reach.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                        <span class="ml-2 text-sm text-gray-900 dark:text-white">Adjust for timezone differences</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Days of Week -->
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Active Days</label>
+                            <div class="mt-3 grid grid-cols-2 gap-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Monday</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Tuesday</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Wednesday</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Thursday</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Friday</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Saturday</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Sunday</span>
+                                </label>
+                            </div>
+
+                            <!-- Timezone -->
+                            <div class="mt-6">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Timezone</label>
+                                <select class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    <option>America/New_York (EST)</option>
+                                    <option>America/Los_Angeles (PST)</option>
+                                    <option>Europe/London (GMT)</option>
+                                    <option>Asia/Tokyo (JST)</option>
+                                    <option>Australia/Sydney (AEST)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caption Settings -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Caption Configuration</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Configure how captions are generated for reposts</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Caption Source</label>
+                            <div class="mt-3 space-y-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="captionSource" value="original" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600">
+                                    <span class="ml-3 text-sm text-gray-900 dark:text-white">Use original caption</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="captionSource" value="template" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600" checked>
+                                    <span class="ml-3 text-sm text-gray-900 dark:text-white">Use template</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="captionSource" value="ai" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600">
+                                    <span class="ml-3 text-sm text-gray-900 dark:text-white">AI-generated</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <!-- Template Editor -->
+                            <div id="template-settings">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Caption Template</label>
+                                <textarea rows="4" 
+                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                                          placeholder="🔥 Amazing content from @{original_author}! 
+
+#viral #trending #repost {original_hashtags}">🔥 Amazing content from @{original_author}! 
+
+#viral #trending #repost {original_hashtags}</textarea>
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    Use variables: {original_author}, {original_hashtags}, {video_title}, {platform}
+                                </p>
+                            </div>
+
+                            <!-- AI Settings -->
+                            <div id="ai-settings" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">AI Prompt</label>
+                                <textarea rows="3" 
+                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                                          placeholder="Generate an engaging caption for this video, include relevant hashtags and mention the original creator">Generate an engaging caption for this video, include relevant hashtags and mention the original creator</textarea>
+                                
+                                <div class="mt-4 space-y-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                        <span class="ml-2 text-sm text-gray-900 dark:text-white">Include trending hashtags</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-900 dark:text-white">Credit original author</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-900 dark:text-white">Add call-to-action</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Watermark/Logo Settings -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Watermark & Branding</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Add your own watermark or logo to reposted videos</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Enable Watermark</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="enable-watermark">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div id="watermark-settings">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Watermark Type</label>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-center">
+                                                <input type="radio" name="watermarkType" value="text" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600" checked>
+                                                <span class="ml-3 text-sm text-gray-900 dark:text-white">Text watermark</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="watermarkType" value="logo" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600">
+                                                <span class="ml-3 text-sm text-gray-900 dark:text-white">Logo/Image</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Text Watermark -->
+                                    <div id="text-watermark">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Watermark Text</label>
+                                        <input type="text" value="@YourBrand" 
+                                               class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+
+                                    <!-- Logo Upload -->
+                                    <div id="logo-watermark" class="hidden">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Logo File</label>
+                                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                            <div class="space-y-1 text-center">
+                                                <i data-lucide="upload" class="mx-auto h-12 w-12 text-gray-400"></i>
+                                                <div class="flex text-sm text-gray-600 dark:text-gray-300">
+                                                    <label class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                                                        <span>Upload a file</span>
+                                                        <input type="file" class="sr-only" accept="image/*">
+                                                    </label>
+                                                    <p class="pl-1">or drag and drop</p>
+                                                </div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Position & Style</label>
+                            <div class="space-y-4">
+                                <!-- Position -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Position</label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="corner-left-up" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="arrow-up" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="corner-right-up" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="arrow-left" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="circle" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="arrow-right" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="corner-left-down" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn p-2 text-center border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <i data-lucide="arrow-down" class="h-4 w-4 mx-auto"></i>
+                                        </button>
+                                        <button type="button" class="position-btn active-position p-2 text-center border-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900 rounded">
+                                            <i data-lucide="corner-right-down" class="h-4 w-4 mx-auto text-indigo-600 dark:text-indigo-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Opacity -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Opacity</label>
+                                    <input type="range" min="0" max="100" value="80" class="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <span>0%</span>
+                                        <span>80%</span>
+                                        <span>100%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Size -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Size</label>
+                                    <select class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <option value="small">Small</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Configuration -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" 
+                        class="btn-primary px-6 py-3 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex-1 sm:flex-initial">
+                    Save Configuration
+                </button>
+                <button type="button" 
+                        class="btn-secondary px-6 py-3 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex-1 sm:flex-initial">
+                    Test Settings
+                </button>
+                <button type="button" 
+                        class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-6 py-3 text-sm font-medium">
+                    Reset to Defaults
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Platform selection handling
+        document.querySelectorAll('.platform-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const platformCard = this.nextElementSibling;
+                const platformSettings = platformCard.parentElement.querySelector('.platform-settings');
+                
+                if (this.checked) {
+                    platformCard.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900', 'selected-platform');
+                    platformCard.classList.remove('border-gray-200', 'dark:border-gray-700');
+                    if (platformSettings) platformSettings.classList.remove('hidden');
+                } else {
+                    platformCard.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900', 'selected-platform');
+                    platformCard.classList.add('border-gray-200', 'dark:border-gray-700');
+                    if (platformSettings) platformSettings.classList.add('hidden');
+                }
+            });
+        });
+
+        // Schedule type handling
+        document.querySelectorAll('input[name="scheduleType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('interval-settings').classList.add('hidden');
+                document.getElementById('specific-settings').classList.add('hidden');
+                document.getElementById('optimal-settings').classList.add('hidden');
+                
+                document.getElementById(this.value + '-settings').classList.remove('hidden');
+            });
+        });
+
+        // Caption source handling
+        document.querySelectorAll('input[name="captionSource"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('template-settings').classList.add('hidden');
+                document.getElementById('ai-settings').classList.add('hidden');
+                
+                if (this.value === 'template') {
+                    document.getElementById('template-settings').classList.remove('hidden');
+                } else if (this.value === 'ai') {
+                    document.getElementById('ai-settings').classList.remove('hidden');
+                }
+            });
+        });
+
+        // Watermark type handling
+        document.querySelectorAll('input[name="watermarkType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('text-watermark').classList.add('hidden');
+                document.getElementById('logo-watermark').classList.add('hidden');
+                
+                document.getElementById(this.value + '-watermark').classList.remove('hidden');
+            });
+        });
+
+        // Watermark enable/disable
+        document.getElementById('enable-watermark').addEventListener('change', function() {
+            const settings = document.getElementById('watermark-settings');
+            if (this.checked) {
+                settings.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                settings.classList.add('opacity-50', 'pointer-events-none');
+            }
+        });
+
+        // Position button handling
+        document.querySelectorAll('.position-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.position-btn').forEach(b => {
+                    b.classList.remove('active-position', 'border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900');
+                    b.classList.add('border-gray-300', 'dark:border-gray-600');
+                    b.querySelector('i').classList.remove('text-indigo-600', 'dark:text-indigo-400');
+                });
+                
+                this.classList.add('active-position', 'border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900');
+                this.classList.remove('border-gray-300', 'dark:border-gray-600');
+                this.querySelector('i').classList.add('text-indigo-600', 'dark:text-indigo-400');
+            });
+        });
+
+        // Initialize watermark settings as disabled
+        document.getElementById('watermark-settings').classList.add('opacity-50', 'pointer-events-none');
+    </script>
+</body>
+</html> 

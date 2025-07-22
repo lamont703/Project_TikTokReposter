@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - TikTok Reposter Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Navigation Bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">📲 TikTok Reposter</h1>
+                    </div>
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="sources.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Sources</a>
+                            <a href="repost-config.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Repost Config</a>
+                            <a href="video-library.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Video Library</a>
+                            <a href="agent-logs.html" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Agent Logs</a>
+                            <a href="settings.html" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+                
+                <!-- Dark mode toggle -->
+                <div class="hidden md:block">
+                    <button id="dark-mode-toggle" class="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i data-lucide="moon" class="h-5 w-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 dark:bg-gray-800">
+                <a href="index.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a href="sources.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Sources</a>
+                <a href="repost-config.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Repost Config</a>
+                <a href="video-library.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Video Library</a>
+                <a href="agent-logs.html" class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium">Agent Logs</a>
+                <a href="settings.html" class="bg-indigo-100 text-indigo-700 block px-3 py-2 rounded-md text-base font-medium">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Settings</h2>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">Configure your TikTok reposter system</p>
+        </div>
+
+        <div class="space-y-8">
+            <!-- API Keys Section -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">API Keys & Authentication</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Configure API keys for various services</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- TikTok API -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">TikTok API</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">App ID</label>
+                                    <div class="relative">
+                                        <input type="password" value="1234567890123456"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">App Secret</label>
+                                    <div class="relative">
+                                        <input type="password" value="abcdef1234567890abcdef1234567890"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-green-400 rounded-full mr-2"></span>
+                                    <span class="text-sm text-green-600 dark:text-green-400">Connected</span>
+                                    <button class="ml-auto text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Test Connection</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instagram API -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Instagram Basic Display API</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">App ID</label>
+                                    <div class="relative">
+                                        <input type="password" value="987654321098765"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">App Secret</label>
+                                    <div class="relative">
+                                        <input type="password" value="fedcba0987654321fedcba0987654321"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-green-400 rounded-full mr-2"></span>
+                                    <span class="text-sm text-green-600 dark:text-green-400">Connected</span>
+                                    <button class="ml-auto text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Test Connection</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- YouTube API -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">YouTube Data API v3</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">API Key</label>
+                                    <div class="relative">
+                                        <input type="password" value="AIzaSyDhF6gHjKlMnOpQrStUvWxYz123456789"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">OAuth Client ID</label>
+                                    <div class="relative">
+                                        <input type="password" value="123456789-abcdefghijklmnop.apps.googleusercontent.com"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-yellow-400 rounded-full mr-2"></span>
+                                    <span class="text-sm text-yellow-600 dark:text-yellow-400">Rate Limited</span>
+                                    <button class="ml-auto text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Test Connection</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Facebook API -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Facebook Graph API</label>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">App ID</label>
+                                    <div class="relative">
+                                        <input type="password" value="567890123456789"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 dark:text-gray-400">App Secret</label>
+                                    <div class="relative">
+                                        <input type="password" value="1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p"
+                                               class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                            <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="h-2 w-2 bg-red-400 rounded-full mr-2"></span>
+                                    <span class="text-sm text-red-600 dark:text-red-400">Not Connected</span>
+                                    <button class="ml-auto text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">Test Connection</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Services -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Video Download Services</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Configure third-party download services</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- SSSTik -->
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-medium text-gray-900 dark:text-white">SSSTik</h4>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                Fast TikTok video downloader with watermark removal
+                            </p>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Status:</span>
+                                    <span class="text-green-600 dark:text-green-400">Active</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Rate Limit:</span>
+                                    <span class="text-gray-900 dark:text-white">100/hour</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Priority:</span>
+                                    <span class="text-gray-900 dark:text-white">Primary</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TikMate -->
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-medium text-gray-900 dark:text-white">TikMate</h4>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                Reliable backup downloader service
+                            </p>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Status:</span>
+                                    <span class="text-green-600 dark:text-green-400">Active</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Rate Limit:</span>
+                                    <span class="text-gray-900 dark:text-white">50/hour</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Priority:</span>
+                                    <span class="text-gray-900 dark:text-white">Secondary</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SnapTik -->
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 opacity-50">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-medium text-gray-900 dark:text-white">SnapTik</h4>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                Additional downloader for redundancy
+                            </p>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Status:</span>
+                                    <span class="text-gray-400">Disabled</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Rate Limit:</span>
+                                    <span class="text-gray-400">30/hour</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500 dark:text-gray-400">Priority:</span>
+                                    <span class="text-gray-400">Tertiary</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Storage Configuration -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Storage Configuration</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Configure where videos and data are stored</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Local Storage -->
+                        <div>
+                            <h4 class="font-medium text-gray-900 dark:text-white mb-4">Local Storage</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Video Directory</label>
+                                    <div class="mt-1 flex rounded-md shadow-sm">
+                                        <input type="text" value="/Users/username/TikTokReposter/videos" 
+                                               class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button class="px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500">
+                                            <i data-lucide="folder" class="h-4 w-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Database Directory</label>
+                                    <div class="mt-1 flex rounded-md shadow-sm">
+                                        <input type="text" value="/Users/username/TikTokReposter/data" 
+                                               class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        <button class="px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500">
+                                            <i data-lucide="folder" class="h-4 w-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Storage Usage</span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">2.3 GB / 500 GB</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                        <div class="bg-indigo-600 h-2 rounded-full" style="width: 4.6%"></div>
+                                    </div>
+                                    <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                        <span>Videos: 1.8 GB</span> • <span>Database: 512 MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cloud Storage -->
+                        <div>
+                            <h4 class="font-medium text-gray-900 dark:text-white mb-4">Cloud Storage</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Enable Cloud Backup</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="cloud-backup">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div id="cloud-settings" class="space-y-4 opacity-50 pointer-events-none">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cloud Provider</label>
+                                        <select class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                            <option>Amazon S3</option>
+                                            <option>Google Cloud Storage</option>
+                                            <option>Microsoft Azure</option>
+                                            <option>Dropbox</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bucket/Container Name</label>
+                                        <input type="text" placeholder="tiktok-reposter-videos" 
+                                               class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Access Key</label>
+                                        <div class="relative">
+                                            <input type="password" placeholder="Enter access key" 
+                                                   class="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-visibility">
+                                                <i data-lucide="eye-off" class="h-5 w-5 text-gray-400"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Auto-upload processed videos</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Delete local copies after upload</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Notification Preferences</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Choose how and when to receive notifications</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Notification Channels -->
+                        <div>
+                            <h4 class="font-medium text-gray-900 dark:text-white mb-4">Notification Channels</h4>
+                            <div class="space-y-6">
+                                <!-- Email -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i data-lucide="mail" class="h-5 w-5 text-gray-400 mr-2"></i>
+                                            <span class="font-medium text-gray-900 dark:text-white">Email</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="ml-7">
+                                        <input type="email" value="user@example.com" 
+                                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                </div>
+
+                                <!-- Slack -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i data-lucide="slack" class="h-5 w-5 text-gray-400 mr-2"></i>
+                                            <span class="font-medium text-gray-900 dark:text-white">Slack</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="ml-7 opacity-50">
+                                        <input type="text" placeholder="Slack webhook URL" 
+                                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                </div>
+
+                                <!-- Discord -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i data-lucide="message-circle" class="h-5 w-5 text-gray-400 mr-2"></i>
+                                            <span class="font-medium text-gray-900 dark:text-white">Discord</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="ml-7 opacity-50">
+                                        <input type="text" placeholder="Discord webhook URL" 
+                                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    </div>
+                                </div>
+
+                                <!-- Telegram -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center">
+                                            <i data-lucide="send" class="h-5 w-5 text-gray-400 mr-2"></i>
+                                            <span class="font-medium text-gray-900 dark:text-white">Telegram</span>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <div class="ml-7 opacity-50">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="text" placeholder="Bot Token" 
+                                                   class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                            <input type="text" placeholder="Chat ID" 
+                                                   class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification Types -->
+                        <div>
+                            <h4 class="font-medium text-gray-900 dark:text-white mb-4">Notification Types</h4>
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <h5 class="font-medium text-gray-900 dark:text-white mb-3">System Events</h5>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Agent failures</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">API rate limits</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Storage warnings</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <h5 class="font-medium text-gray-900 dark:text-white mb-3">Content Events</h5>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Successful posts</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">New videos found</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Processing completed</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <h5 class="font-medium text-gray-900 dark:text-white mb-3">Performance Reports</h5>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Daily summary</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Weekly report</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                            <span class="ml-2 text-sm text-gray-900 dark:text-white">Monthly analytics</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Settings -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">System Settings</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">General system configuration options</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">System Timezone</label>
+                                <select class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    <option>America/New_York (EST)</option>
+                                    <option>America/Los_Angeles (PST)</option>
+                                    <option>Europe/London (GMT)</option>
+                                    <option>Asia/Tokyo (JST)</option>
+                                    <option>Australia/Sydney (AEST)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Log Level</label>
+                                <select class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                                    <option>Error</option>
+                                    <option>Warning</option>
+                                    <option selected>Info</option>
+                                    <option>Debug</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Concurrent Downloads</label>
+                                <input type="number" value="3" min="1" max="10" 
+                                       class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white">
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Auto-start agents on system boot</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Enable error recovery</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <span class="ml-2 text-gray-900 dark:text-white">Enable debug mode</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">Automatic updates</span>
+                                </label>
+                            </div>
+
+                            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                                <h5 class="font-medium text-gray-900 dark:text-white mb-3">System Information</h5>
+                                <div class="text-sm space-y-1 text-gray-600 dark:text-gray-300">
+                                    <div>Version: 1.2.3</div>
+                                    <div>Node.js: v18.17.0</div>
+                                    <div>Platform: darwin-arm64</div>
+                                    <div>Uptime: 2d 14h 32m</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" 
+                        class="btn-primary px-6 py-3 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex-1 sm:flex-initial">
+                    Save All Settings
+                </button>
+                <button type="button" 
+                        class="btn-secondary px-6 py-3 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex-1 sm:flex-initial">
+                    Test All Connections
+                </button>
+                <button type="button" 
+                        class="btn-danger px-6 py-3 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex-1 sm:flex-initial">
+                    Reset to Defaults
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Toggle visibility for password fields
+        document.querySelectorAll('.toggle-visibility').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.setAttribute('data-lucide', 'eye');
+                } else {
+                    input.type = 'password';
+                    icon.setAttribute('data-lucide', 'eye-off');
+                }
+                
+                lucide.createIcons();
+            });
+        });
+
+        // Cloud backup toggle
+        document.getElementById('cloud-backup').addEventListener('change', function() {
+            const settings = document.getElementById('cloud-settings');
+            if (this.checked) {
+                settings.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                settings.classList.add('opacity-50', 'pointer-events-none');
+            }
+        });
+
+        // Test connection buttons
+        document.querySelectorAll('button').forEach(button => {
+            if (button.textContent.includes('Test Connection')) {
+                button.addEventListener('click', function() {
+                    const apiName = this.closest('.space-y-3, .grid').querySelector('label').textContent;
+                    TikTokDashboard.showNotification(`Testing ${apiName} connection...`, 'info');
+                    
+                    // Simulate connection test
+                    setTimeout(() => {
+                        const success = Math.random() > 0.3; // 70% success rate
+                        if (success) {
+                            TikTokDashboard.showNotification(`${apiName} connection successful!`, 'success');
+                        } else {
+                            TikTokDashboard.showNotification(`${apiName} connection failed!`, 'error');
+                        }
+                    }, 2000);
+                });
+            }
+        });
+
+        // Save settings
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            TikTokDashboard.showNotification('Settings saved successfully!', 'success');
+        });
+
+        // Test all connections
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            TikTokDashboard.showNotification('Testing all connections...', 'info');
+            
+            setTimeout(() => {
+                TikTokDashboard.showNotification('Connection tests completed!', 'success');
+            }, 3000);
+        });
+
+        // Reset to defaults
+        document.querySelector('.btn-danger').addEventListener('click', function() {
+            if (confirm('Are you sure you want to reset all settings to defaults? This action cannot be undone.')) {
+                TikTokDashboard.showNotification('Settings reset to defaults', 'success');
+                // In real app, this would reset all form fields
+            }
+        });
+    </script>
+</body>
+</html> 
