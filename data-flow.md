@@ -1,10 +1,10 @@
 # 🔄 Data Flow Documentation
 
-This document outlines the complete data flow and system architecture for the TikTok Video Reposter Dashboard, from content discovery to multi-platform distribution.
+This document outlines the complete data flow and system architecture for the TikTok Video Reposter Dashboard, from content discovery to TikTok reposting, designed for local operation with JavaScript-based services.
 
 ## 🎯 System Overview
 
-The TikTok Reposter system follows an agentic automation approach where intelligent agents handle different aspects of the content workflow. The dashboard provides monitoring and control over these automated processes.
+The TikTok Reposter system follows an agentic automation approach where intelligent agents handle different aspects of the content workflow. The dashboard provides monitoring and control over these automated processes, with all operations running locally and TikTok as the primary target platform.
 
 ```mermaid
 graph TB
@@ -30,21 +30,24 @@ graph TB
 
     subgraph "Storage Layer"
         LS[Local Storage]
-        CS[Cloud Storage]
-        DB[Database]
+        AS[Azure Blob Storage]
+        DB[SQLite Database]
+        CL[7-Day Cleanup]
     end
 
     subgraph "Publishing Layer"
         PUB[Publisher Agent]
         SCH[Scheduler]
-        API[Platform APIs]
+        API[TikTok API]
     end
 
-    subgraph "Target Platforms"
-        IG[Instagram Reels]
-        YT[YouTube Shorts]
-        FB[Facebook Videos]
+    subgraph "Target Platform"
         TTA[TikTok Alt Account]
+    end
+
+    subgraph "Notification Layer"
+        EM[Email Service]
+        SMTP[SMTP Server]
     end
 
     TT --> SA1
@@ -61,20 +64,22 @@ graph TB
     PA --> CC
 
     WR --> LS
-    QE --> CS
+    QE --> LS
     CC --> DB
 
+    LS --> AS
+    AS --> CL
     LS --> SCH
-    CS --> SCH
     DB --> SCH
 
     SCH --> PUB
     PUB --> API
 
-    API --> IG
-    API --> YT
-    API --> FB
     API --> TTA
+
+    PUB --> EM
+    PA --> EM
+    EM --> SMTP
 ```
 
 ## 📊 Detailed Data Flow Stages
@@ -108,7 +113,7 @@ graph TB
 2. **Authentication**: Agents authenticate with TikTok (if required)
 3. **Content Fetching**: Retrieve video metadata and URLs
 4. **Filtering**: Apply user-defined filters (views, age, quality)
-5. **Deduplication**: Check against existing videos in database
+5. **Deduplication**: Check against existing videos in SQLite database
 
 #### 1.3 Data Extraction
 
@@ -169,7 +174,7 @@ const downloadServices = [
 
 1. **Service Selection**: Choose primary download service
 2. **URL Processing**: Extract video download URLs
-3. **Download Initiation**: Start video file download
+3. **Download Initiation**: Start video file download to local storage
 4. **Progress Tracking**: Monitor download progress
 5. **Validation**: Verify file integrity and quality
 6. **Fallback Logic**: Try alternative services on failure
@@ -210,24 +215,24 @@ const processingSteps = [
 
 ### 3. Content Storage & Management
 
-**Purpose**: Secure storage and organization of processed videos
+**Purpose**: Secure local storage with Azure cloud backup
 
 #### 3.1 Local Storage Structure
 
 ```
 /TikTokReposter/
-├── videos/
-│   ├── raw/                    # Original downloads
+├── storage/
+│   ├── videos/                 # Primary video storage
 │   │   └── 2024/01/15/
-│   ├── processed/              # Processed videos
+│   ├── thumbnails/             # Generated thumbnails
 │   │   └── 2024/01/15/
-│   └── thumbnails/             # Generated thumbnails
-│       └── 2024/01/15/
-├── data/
-│   ├── database.sqlite         # Metadata database
-│   ├── logs/                   # System logs
-│   └── config/                 # Configuration files
-└── temp/                       # Temporary processing files
+│   ├── temp/                   # Temporary processing files
+│   └── database.sqlite         # SQLite database
+├── config/
+│   ├── database.js
+│   ├── azure.js
+│   └── email.js
+└── logs/                       # System logs
 ```
 
 #### 3.2 Database Schema
@@ -240,7 +245,7 @@ CREATE TABLE videos (
     source_id VARCHAR(50),
     original_url TEXT,
     local_path TEXT,
-    cloud_path TEXT,
+    azure_path TEXT,
     title TEXT,
     description TEXT,
     author VARCHAR(100),
@@ -266,7 +271,7 @@ CREATE TABLE sources (
 CREATE TABLE scheduled_posts (
     id INTEGER PRIMARY KEY,
     video_id VARCHAR(50),
-    platform VARCHAR(50),
+    tiktok_account VARCHAR(100),
     scheduled_time TIMESTAMP,
     status VARCHAR(20),
     post_id VARCHAR(100),
@@ -274,33 +279,53 @@ CREATE TABLE scheduled_posts (
 );
 ```
 
-#### 3.3 Cloud Storage Integration
+#### 3.3 Azure Blob Storage Integration
 
 ```javascript
-// Cloud storage configuration
+// Azure storage configuration
 {
-  "provider": "aws-s3|google-cloud|azure|dropbox",
+  "provider": "azure-blob",
   "credentials": {
-    "accessKey": "encrypted_key",
-    "secretKey": "encrypted_secret",
-    "bucket": "tiktok-reposter-videos",
-    "region": "us-west-2"
+    "connectionString": "encrypted_connection_string",
+    "containerName": "tiktok-videos",
+    "storageAccount": "tiktokrepostervids"
   },
   "settings": {
     "autoUpload": true,
     "deleteLocalAfterUpload": false,
     "publicAccess": false,
     "lifecycle": {
-      "deleteAfter": "90d",
-      "archiveAfter": "30d"
+      "deleteAfter": "7d",
+      "enableLogging": true
     }
   }
 }
 ```
 
+#### 3.4 Automated Cleanup Service
+
+```javascript
+// 7-day cleanup service
+const cleanupService = {
+  "schedule": "0 2 * * *", // Daily at 2 AM
+  "actions": [
+    {
+      "type": "azure_cleanup",
+      "retention": "7d",
+      "dryRun": false
+    },
+    {
+      "type": "temp_file_cleanup",
+      "retention": "24h",
+      "path": "./storage/temp"
+    }
+  ]
+};
+```
+
 ### 4. Caption & Metadata Processing
 
-**Purpose**: Generate appropriate captions for each target platform
+**Purpose**: Generate appropriate captions for TikTok reposting
 
 #### 4.1 Caption Generation Methods
 
@@ -314,12 +339,12 @@ CREATE TABLE scheduled_posts (
       "original_author": "@techguru123",
       "original_hashtags": "#tech #ai #demo",
       "video_title": "Amazing tech demo",
-      "platform": "instagram"
+      "platform": "tiktok"
     }
   },
   "aiConfig": {
     "provider": "openai|claude|custom",
-    "prompt": "Generate an engaging caption for this video...",
+    "prompt": "Generate an engaging TikTok caption for this video...",
     "maxLength": 150,
     "includeHashtags": true,
     "creditOriginal": true
@@ -327,41 +352,23 @@ CREATE TABLE scheduled_posts (
 }
 ```
 
-#### 4.2 Platform-Specific Adaptations
+#### 4.2 TikTok-Specific Requirements
 
 ```javascript
-// Platform caption requirements
-const platformSpecs = {
-  instagram: {
-    maxLength: 2200,
-    hashtagLimit: 30,
-    supportsMarkdown: false,
-    requiresDescription: false,
-  },
-  youtube: {
-    maxLength: 5000,
-    hashtagLimit: 15,
-    supportsMarkdown: true,
-    requiresDescription: true,
-  },
-  facebook: {
-    maxLength: 63206,
-    hashtagLimit: null,
-    supportsMarkdown: false,
-    requiresDescription: false,
-  },
-  tiktok: {
-    maxLength: 150,
-    hashtagLimit: null,
-    supportsMarkdown: false,
-    requiresDescription: false,
-  },
+// TikTok caption specifications
+const tiktokSpecs = {
+  maxLength: 150,
+  hashtagLimit: null, // No strict limit
+  supportsMarkdown: false,
+  requiresDescription: false,
+  optimalHashtags: "3-5",
+  trendingHashtags: true
 };
 ```
 
 ### 5. Scheduling & Queue Management
 
-**Purpose**: Optimize posting times and manage platform rate limits
+**Purpose**: Optimize TikTok posting times and manage rate limits
 
 #### 5.1 Scheduling Algorithm
 
@@ -375,7 +382,7 @@ const platformSpecs = {
       "start": "08:00",
       "end": "22:00"
     },
-    "activeDays": [1, 2, 3, 4, 5], // Monday-Friday
+    "activeDays": [1, 2, 3, 4, 5, 6, 7], // All days
     "timezone": "America/New_York"
   },
   "specificConfig": {
@@ -397,7 +404,8 @@ const platformSpecs = {
 {
   "queueId": "queue_001",
   "videoId": "vid_123456",
-  "platform": "instagram",
+  "platform": "tiktok",
+  "tiktokAccount": "@myaltaccount",
   "scheduledTime": "2024-01-15T14:00:00Z",
   "priority": "normal|high|low",
   "status": "queued|processing|posted|failed",
@@ -408,67 +416,48 @@ const platformSpecs = {
   "metadata": {
     "caption": "Generated caption...",
     "hashtags": ["#viral", "#trending"],
-    "accountId": "account_123"
+    "accountCredentials": "encrypted_token"
   }
 }
 ```
 
-### 6. Multi-Platform Publishing
+### 6. TikTok Publishing
 
-**Purpose**: Distribute content across configured social media platforms
+**Purpose**: Distribute content to alternative TikTok accounts
 
-#### 6.1 Platform API Integration
+#### 6.1 TikTok API Integration
 
 ```javascript
-// API configuration per platform
-const apiConfigs = {
-  instagram: {
-    endpoint: "https://graph.facebook.com/v18.0",
-    auth: "oauth2",
-    rateLimit: "200/hour",
-    mediaTypes: ["image", "video"],
-    maxVideoSize: "100MB",
-    maxDuration: "60s",
-  },
-  youtube: {
-    endpoint: "https://www.googleapis.com/youtube/v3",
-    auth: "oauth2",
-    rateLimit: "10000/day",
-    mediaTypes: ["video"],
-    maxVideoSize: "256GB",
-    maxDuration: "60s", // For Shorts
-  },
-  facebook: {
-    endpoint: "https://graph.facebook.com/v18.0",
-    auth: "oauth2",
-    rateLimit: "200/hour",
-    mediaTypes: ["image", "video"],
-    maxVideoSize: "10GB",
-    maxDuration: "240m",
-  },
+// TikTok API configuration
+const tiktokAPI = {
+  endpoint: "https://open-api.tiktok.com",
+  auth: "oauth2",
+  rateLimit: "100/day",
+  mediaTypes: ["video"],
+  maxVideoSize: "287MB",
+  maxDuration: "180s",
+  supportedFormats: ["mp4", "mov", "mpeg", "3gp", "avi"]
 };
 ```
 
 #### 6.2 Publishing Workflow
 
 1. **Pre-Publishing Validation**
-
-   - Check API rate limits
+   - Check TikTok API rate limits
    - Validate video format and size
    - Verify authentication tokens
    - Confirm caption requirements
 
 2. **Upload Process**
-
-   - Initialize upload session
+   - Initialize upload session with TikTok
    - Upload video file (chunked if necessary)
-   - Set video metadata
+   - Set video metadata and caption
    - Schedule or publish immediately
 
 3. **Post-Publishing Actions**
-   - Store platform-specific post ID
-   - Update database with published status
-   - Log success/failure details
+   - Store TikTok post ID
+   - Update SQLite database with published status
+   - Trigger email notification
    - Queue retry attempts if needed
 
 #### 6.3 Error Handling & Retry Logic
@@ -481,21 +470,82 @@ const apiConfigs = {
   "retryConditions": [
     "rate_limit_exceeded",
     "temporary_server_error",
-    "network_timeout"
+    "network_timeout",
+    "invalid_token"
   ],
   "failureActions": {
-    "notify": true,
+    "emailNotify": true,
     "moveToManualReview": true,
-    "disableSource": false
+    "pauseAccount": false
   }
 }
 ```
 
-### 7. Monitoring & Analytics
+### 7. Email Notification System
+
+**Purpose**: Keep users informed of system status and activities
+
+#### 7.1 SMTP Configuration
+
+```javascript
+// Email service configuration
+{
+  "smtp": {
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "secure": false,
+    "auth": {
+      "user": "your_email@gmail.com",
+      "pass": "app_password"
+    }
+  },
+  "templates": {
+    "success": "./templates/success.html",
+    "error": "./templates/error.html",
+    "daily_summary": "./templates/daily_summary.html"
+  },
+  "recipients": {
+    "errors": ["admin@yourdomain.com"],
+    "summaries": ["reports@yourdomain.com"],
+    "all": ["notifications@yourdomain.com"]
+  }
+}
+```
+
+#### 7.2 Notification Types
+
+```javascript
+// Email notification categories
+const notificationTypes = {
+  "system_start": {
+    "template": "system_status",
+    "recipients": "admin",
+    "priority": "normal"
+  },
+  "video_posted": {
+    "template": "success",
+    "recipients": "all",
+    "priority": "low"
+  },
+  "posting_error": {
+    "template": "error",
+    "recipients": "errors",
+    "priority": "high"
+  },
+  "daily_summary": {
+    "template": "daily_summary",
+    "recipients": "summaries",
+    "priority": "normal",
+    "schedule": "0 18 * * *"
+  }
+};
+```
+
+### 8. Monitoring & Analytics
 
 **Purpose**: Track system performance and content success metrics
 
-#### 7.1 System Metrics
+#### 8.1 System Metrics
 
 ```javascript
 // System performance metrics
@@ -519,51 +569,39 @@ const apiConfigs = {
       "postsPublished": 8,
       "apiErrors": 2,
       "rateLimitHits": 1
+    },
+    "storage": {
+      "localUsage": "2.3GB",
+      "azureUsage": "1.8GB",
+      "cleanupRuns": 7
     }
   }
 }
 ```
 
-#### 7.2 Content Performance Tracking
+#### 8.2 Content Performance Tracking
 
 ```javascript
 // Content analytics
 {
   "videoId": "vid_123456",
-  "platforms": [
-    {
-      "platform": "instagram",
-      "postId": "ig_post_789",
-      "publishedAt": "2024-01-15T14:00:00Z",
-      "metrics": {
-        "views": 1500,
-        "likes": 89,
-        "comments": 12,
-        "shares": 6,
-        "lastUpdated": "2024-01-15T18:00:00Z"
-      }
+  "tiktokPost": {
+    "postId": "tiktok_post_789",
+    "publishedAt": "2024-01-15T14:00:00Z",
+    "metrics": {
+      "views": 1500,
+      "likes": 89,
+      "comments": 12,
+      "shares": 6,
+      "lastUpdated": "2024-01-15T18:00:00Z"
     }
-  ]
+  }
 }
 ```
 
-## 🔧 Integration Points
+## 🔧 Local Integration Points
 
-### n8n Workflow Integration
-
-The dashboard interfaces with n8n workflows that handle the backend automation:
-
-```javascript
-// n8n webhook endpoints
-const webhookEndpoints = {
-  scraping: "/webhook/scraping-complete",
-  processing: "/webhook/video-processed",
-  publishing: "/webhook/post-published",
-  errors: "/webhook/error-notification",
-};
-```
-
-### API Endpoints for Dashboard
+### Express.js API Endpoints
 
 ```javascript
 // Dashboard API endpoints
@@ -580,8 +618,6 @@ const dashboardAPI = {
 };
 ```
 
-## 🔄 Real-Time Updates
-
 ### WebSocket Events
 
 ```javascript
@@ -592,6 +628,7 @@ const wsEvents = {
   "post.published": "Successful post publication",
   "error.occurred": "System errors",
   "queue.updated": "Queue status changes",
+  "storage.cleanup": "Azure cleanup notifications"
 };
 ```
 
@@ -615,21 +652,21 @@ const wsEvents = {
 ### Scalability Points
 
 1. **Concurrent Processing**: Multiple agents can work simultaneously
-2. **Database Optimization**: Indexed queries for video searches
-3. **Cache Strategy**: Redis for frequently accessed data
+2. **Database Optimization**: Indexed SQLite queries for video searches
+3. **File System Efficiency**: Organized directory structure for fast access
 4. **Load Balancing**: Distribute scraping tasks across agents
 5. **Queue Management**: Priority-based queue processing
 
 ### Rate Limit Management
 
 ```javascript
-// Rate limiting strategy
+// Rate limiting strategy for TikTok
 {
-  "platform": "instagram",
+  "platform": "tiktok",
   "limits": {
     "postsPerHour": 5,
     "postsPerDay": 25,
-    "apiCallsPerHour": 200
+    "apiCallsPerHour": 100
   },
   "current": {
     "postsThisHour": 2,
@@ -640,21 +677,54 @@ const wsEvents = {
 }
 ```
 
+### Azure Storage Optimization
+
+```javascript
+// Storage optimization settings
+{
+  "uploadStrategy": "background_async",
+  "compressionLevel": "standard",
+  "parallelUploads": 3,
+  "retryPolicy": {
+    "maxRetries": 3,
+    "backoff": "exponential"
+  },
+  "cleanupMonitoring": {
+    "logDeletions": true,
+    "emailSummary": true
+  }
+}
+```
+
 ## 🚨 Error Handling & Recovery
 
 ### Error Types and Recovery
 
 1. **Network Errors**: Retry with exponential backoff
-2. **API Errors**: Check rate limits, refresh tokens
+2. **TikTok API Errors**: Check rate limits, refresh tokens
 3. **Processing Errors**: Move to manual review queue
-4. **Storage Errors**: Fallback to alternative storage
-5. **Authentication Errors**: Notify admin, pause operations
+4. **Storage Errors**: Fallback to local-only storage
+5. **Azure Errors**: Continue with local storage, retry upload later
 
 ### Data Integrity
 
-- Database transactions for critical operations
-- Checksums for file integrity verification
-- Backup strategies for configuration and logs
+- SQLite transactions for critical operations
+- File checksums for integrity verification
+- Automated backup strategies for database
 - Recovery procedures for partial failures
+- Email alerts for critical system issues
 
-This data flow documentation provides a comprehensive view of how data moves through the TikTok Reposter system, enabling stakeholders to understand the complete automation workflow and integration points.
+### Local Environment Recovery
+
+```javascript
+// Recovery procedures
+const recoveryActions = {
+  "database_corruption": "restore_from_backup",
+  "storage_full": "cleanup_old_files_and_notify",
+  "azure_connection_lost": "queue_uploads_for_retry",
+  "tiktok_auth_expired": "pause_posting_and_notify",
+  "agent_crash": "restart_agent_and_log"
+};
+```
+
+This data flow documentation provides a comprehensive view of how data moves through the TikTok Reposter system, focusing on local operation, TikTok-specific workflows, Azure storage integration, and email-based notifications.

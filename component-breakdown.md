@@ -165,32 +165,30 @@ This document provides a detailed breakdown of all UI components used throughout
 
 ## 🔄 Repost Configuration Components
 
-### Platform Selection Grid
+### TikTok Account Selection
 
 **File**: `repost-config.html`  
-**Purpose**: Choose target platforms for reposting
+**Purpose**: Choose target TikTok accounts for reposting
 
-#### Platform Cards:
+#### Account Cards:
 
-- **Instagram Reels**: Pink gradient icon
-- **YouTube Shorts**: Red background icon
-- **Facebook**: Blue background icon
-- **TikTok Alt**: Black background icon
+- **Primary Alt Account**: Main alternative account
+- **Secondary Alt Account**: Backup account option
+- **Custom Account**: User-defined account credentials
 
 #### Features:
 
-- Visual selection with checkboxes
-- Platform-specific settings panels
-- Color-coded platform branding
-- Conditional settings visibility
+- Account selection with radio buttons
+- Account-specific settings panels
+- Status indicators for account health
+- Credential management interface
 
 #### CSS Classes:
 
 ```css
-.platform-instagram: gradient background
-.platform-youtube: bg-red-500
-.platform-facebook: bg-blue-500
-.platform-tiktok: bg-black
+.account-primary: bg-black text-white
+.account-secondary: bg-gray-800 text-white
+.account-custom: bg-indigo-600 text-white
 ```
 
 ### Scheduling Options
@@ -368,10 +366,10 @@ This document provides a detailed breakdown of all UI components used throughout
 
 #### API Services:
 
-- **TikTok API**: App ID and Secret
-- **Instagram API**: App credentials
-- **YouTube API**: API key and OAuth
-- **Facebook API**: App ID and Secret
+- **TikTok Business API**: App ID and Secret for posting
+- **TikTok Web API**: Credentials for content scraping
+- **Azure Blob Storage**: Connection string and container settings
+- **SMTP Email**: Email server configuration for notifications
 
 #### Features:
 
@@ -416,12 +414,12 @@ This document provides a detailed breakdown of all UI components used throughout
 **File**: `settings.html`  
 **Purpose**: Configure notification channels and types
 
-#### Channels:
+#### Email Configuration:
 
-- **Email**: With address input
-- **Slack**: Webhook URL
-- **Discord**: Webhook URL
-- **Telegram**: Bot token and chat ID
+- **SMTP Settings**: Server, port, and authentication
+- **Recipients**: Multiple email addresses for different notification types
+- **Templates**: Customizable email templates for different events
+- **Frequency**: Configure notification frequency and batching
 
 #### Features:
 
