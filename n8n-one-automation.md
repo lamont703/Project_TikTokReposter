@@ -1,6 +1,6 @@
 # 🚀 n8n Single Continuous Automation - TikTok Reposter
 
-This document describes a complete TikTok Video Reposter system as **ONE** continuous n8n workflow that runs from content discovery to publishing without any stops or separate workflows. The entire process flows seamlessly from scraping to posting in a single automation.
+This document describes a complete TikTok Video Reposter system as **ONE** continuous n8n workflow that runs from content discovery to publishing without any stops or separate workflows. The entire process flows seamlessly from scraping to immediate posting in a single automation.
 
 ## 🎯 Single Workflow Overview
 
@@ -9,21 +9,21 @@ Instead of multiple separate workflows, this is one comprehensive n8n automation
 2. **Downloads** videos using various services  
 3. **Processes** videos (watermark removal, quality enhancement)
 4. **Stores** in Azure Blob Storage
-5. **Schedules** and **publishes** to TikTok accounts
+5. **Immediately publishes** to TikTok accounts (no scheduling delays)
 6. **Sends notifications** and **cleans up** - all in one continuous flow
 
 ### 🏗️ Single Flow Architecture
 
 ```mermaid
 graph TB
-    START[Cron Trigger] --> SOURCES[Get Active Sources]
+    START[Cron Trigger - Every 4 Hours] --> SOURCES[Get Active Sources]
     SOURCES --> SCRAPE[Scrape TikTok Content]
     SCRAPE --> FILTER[Apply Filters]
     FILTER --> DOWNLOAD[Download Videos]
     DOWNLOAD --> PROCESS[Process Videos]
     PROCESS --> UPLOAD[Upload to Azure]
-    UPLOAD --> SCHEDULE[Generate Posting Schedule]
-    SCHEDULE --> PUBLISH[Publish to TikTok]
+    UPLOAD --> CAPTION[Generate Caption]
+    CAPTION --> PUBLISH[Publish to TikTok Immediately]
     PUBLISH --> NOTIFY[Send Notifications]
     NOTIFY --> CLEANUP[Cleanup Files]
     CLEANUP --> END[Complete]
@@ -32,8 +32,8 @@ graph TB
 ## 📋 Complete Single Workflow Specification
 
 **Workflow Name**: `tiktok-reposter-complete`  
-**Trigger**: Cron Schedule (every 2 hours) + Manual Trigger  
-**Purpose**: Complete TikTok reposting pipeline in one continuous flow
+**Trigger**: Cron Schedule (every 4 hours) + Manual Trigger  
+**Purpose**: Complete TikTok reposting pipeline with immediate posting in one continuous flow
 
 ## 🔄 Full Workflow Nodes
 
@@ -54,7 +54,7 @@ graph TB
               },
               {
                 "field": "hour", 
-                "value": "*/2"
+                "value": "*/4"
               }
             ]
           }
@@ -189,15 +189,664 @@ graph TB
         }
       },
       {
-        "name": "11. Schedule Post",
-        "type": "n8n-nodes-base.code",
+        "name": "11. TikTok Authentication",
+        "type": "n8n-nodes-base.httpRequest",
         "parameters": {
-          "mode": "runOnceForEachItem",
-          "jsCode": "const video = $input.item(0).json;\n\n// Get posting schedule configuration\nconst postingSchedule = {\n  optimalHours: [10, 14, 18, 20], // Peak engagement hours\n  daysOfWeek: [1, 2, 3, 4, 5, 6, 0], // All days\n  minInterval: 30, // Minimum 30 minutes between posts\n  maxPostsPerDay: 5\n};\n\n// Calculate next optimal posting time\nconst now = new Date();\nconst currentHour = now.getHours();\n\n// Find next optimal hour\nlet nextHour = postingSchedule.optimalHours.find(hour => hour > currentHour);\nif (!nextHour) {\n  // Use first hour of next day\n  nextHour = postingSchedule.optimalHours[0];\n  now.setDate(now.getDate() + 1);\n}\n\n// Set scheduled time\nconst scheduledTime = new Date(now);\nscheduledTime.setHours(nextHour, Math.floor(Math.random() * 60), 0, 0);\n\n// Add random delay (5-15 minutes) to avoid posting at exact same time\nconst randomDelay = Math.floor(Math.random() * 10 + 5) * 60 * 1000;\nscheduledTime.setTime(scheduledTime.getTime() + randomDelay);\n\nreturn {\n  json: {\n    ...video,\n    processing_status: 'scheduled',\n    scheduled_time: scheduledTime.toISOString(),\n    scheduled_at: new Date().toISOString()\n  },\n  binary: $input.item(0).binary\n};"
+          "url": "https://open-api.tiktok.com/oauth/access_token/",
+          "method": "POST",
+          "bodyParametersUi": {
+            "parameter": [
+              {
+                "name": "client_key",
+                "value": "={{process.env.TIKTOK_CLIENT_ID}}"
+              },
+              {
+                "name": "client_secret",
+                "value": "={{process.env.TIKTOK_CLIENT_SECRET}}"
+              },
+              {
+                "name": "code",
+                "value": "={{process.env.TIKTOK_AUTH_CODE}}"
+              },
+              {
+                "name": "grant_type",
+                "value": "authorization_code"
+              }
+            ]
+          },
+          "responseFormat": "json"
         }
       },
       {
-        "name": "12. Check Posting Time",
+        "name": "12. Check Rate Limits",
+        "type": "n8n-nodes-base.httpRequest",
+        "parameters": {
+          "url": "http://localhost:3000/api/rate-limits/tiktok",
+          "method": "GET",
+          "responseFormat": "json"
+        }
+      },
+      {
+        "name": "13. Rate Limit Check",
         "type": "n8n-nodes-base.if",
         "parameters": {
-          "conditions": {\n            \"options\": [\n              {\n                \"conditions\": [\n                  {\n                    \"leftValue\": \"={{new Date($json.scheduled_time).getTime() <= Date.now()}}\",\n                    \"rightValue\": true,\n                    \"operator\": {\n                      \"type\": \"boolean\"\n                    }\n                  }\n                ]\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"name\": \"13. TikTok Authentication\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"https://open-api.tiktok.com/oauth/access_token/\",\n          \"method\": \"POST\",\n          \"bodyParametersUi\": {\n            \"parameter\": [\n              {\n                \"name\": \"client_key\",\n                \"value\": \"={{process.env.TIKTOK_CLIENT_ID}}\"\n              },\n              {\n                \"name\": \"client_secret\",\n                \"value\": \"={{process.env.TIKTOK_CLIENT_SECRET}}\"\n              },\n              {\n                \"name\": \"code\",\n                \"value\": \"={{process.env.TIKTOK_AUTH_CODE}}\"\n              },\n              {\n                \"name\": \"grant_type\",\n                \"value\": \"authorization_code\"\n              }\n            ]\n          },\n          \"responseFormat\": \"json\"\n        }\n      },\n      {\n        \"name\": \"14. Check Rate Limits\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"http://localhost:3000/api/rate-limits/tiktok\",\n          \"method\": \"GET\",\n          \"responseFormat\": \"json\"\n        }\n      },\n      {\n        \"name\": \"15. Rate Limit Check\",\n        \"type\": \"n8n-nodes-base.if\",\n        \"parameters\": {\n          \"conditions\": {\n            \"options\": [\n              {\n                \"conditions\": [\n                  {\n                    \"leftValue\": \"={{$json.can_post}}\",\n                    \"rightValue\": true,\n                    \"operator\": {\n                      \"type\": \"boolean\"\n                    }\n                  }\n                ]\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"name\": \"16. Upload Video to TikTok\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"https://open-api.tiktok.com/share/video/upload/\",\n          \"method\": \"POST\",\n          \"sendBinaryData\": true,\n          \"binaryPropertyName\": \"processed_video\",\n          \"headers\": {\n            \"Authorization\": \"Bearer {{$('13. TikTok Authentication').item(0).json.access_token}}\",\n            \"Content-Type\": \"multipart/form-data\"\n          },\n          \"responseFormat\": \"json\"\n        }\n      },\n      {\n        \"name\": \"17. Publish Video to TikTok\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"https://open-api.tiktok.com/share/video/publish/\",\n          \"method\": \"POST\",\n          \"headers\": {\n            \"Authorization\": \"Bearer {{$('13. TikTok Authentication').item(0).json.access_token}}\",\n            \"Content-Type\": \"application/json\"\n          },\n          \"bodyParametersUi\": {\n            \"parameter\": [\n              {\n                \"name\": \"media_id\",\n                \"value\": \"={{$('16. Upload Video to TikTok').item(0).json.media_id}}\"\n              },\n              {\n                \"name\": \"text\",\n                \"value\": \"={{$('10. Generate Caption').item(0).json.generated_caption}}\"\n              },\n              {\n                \"name\": \"privacy_level\",\n                \"value\": \"SELF_ONLY\"\n              },\n              {\n                \"name\": \"disable_duet\",\n                \"value\": false\n              },\n              {\n                \"name\": \"disable_comment\",\n                \"value\": false\n              },\n              {\n                \"name\": \"disable_stitch\",\n                \"value\": false\n              }\n            ]\n          },\n          \"responseFormat\": \"json\"\n        }\n      },\n      {\n        \"name\": \"18. Update Database - Posted\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"http://localhost:3000/api/videos/{{$('9. Save to Database').item(0).json.video_id}}\",\n          \"method\": \"PUT\",\n          \"bodyParametersUi\": {\n            \"parameter\": [\n              {\n                \"name\": \"processing_status\",\n                \"value\": \"posted\"\n              },\n              {\n                \"name\": \"tiktok_post_id\",\n                \"value\": \"={{$json.share_id}}\"\n              },\n              {\n                \"name\": \"posted_at\",\n                \"value\": \"={{new Date().toISOString()}}\"\n              },\n              {\n                \"name\": \"generated_caption\",\n                \"value\": \"={{$('10. Generate Caption').item(0).json.generated_caption}}\"\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"name\": \"19. Send Success Notification\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"http://localhost:3000/api/email/success\",\n          \"method\": \"POST\",\n          \"bodyParametersUi\": {\n            \"parameter\": [\n              {\n                \"name\": \"video_id\",\n                \"value\": \"={{$('9. Save to Database').item(0).json.video_id}}\"\n              },\n              {\n                \"name\": \"video_title\",\n                \"value\": \"={{$('10. Generate Caption').item(0).json.title}}\"\n              },\n              {\n                \"name\": \"author\",\n                \"value\": \"={{$('10. Generate Caption').item(0).json.author}}\"\n              },\n              {\n                \"name\": \"tiktok_post_id\",\n                \"value\": \"={{$('17. Publish Video to TikTok').item(0).json.share_id}}\"\n              },\n              {\n                \"name\": \"posted_at\",\n                \"value\": \"={{new Date().toISOString()}}\"\n              },\n              {\n                \"name\": \"caption\",\n                \"value\": \"={{$('10. Generate Caption').item(0).json.generated_caption}}\"\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"name\": \"20. Cleanup Local Files\",\n        \"type\": \"n8n-nodes-base.code\",\n        \"parameters\": {\n          \"mode\": \"runOnceForEachItem\",\n          \"jsCode\": \"const fs = require('fs');\nconst video = $input.item(0).json;\n\n// Clean up processed video file\nif (video.processed_path && fs.existsSync(video.processed_path)) {\n  fs.unlinkSync(video.processed_path);\n}\n\n// Clean up thumbnail files\nif (video.thumbnails && Array.isArray(video.thumbnails)) {\n  video.thumbnails.forEach(thumbPath => {\n    if (fs.existsSync(thumbPath)) {\n      fs.unlinkSync(thumbPath);\n    }\n  });\n}\n\nreturn {\n  json: {\n    ...video,\n    processing_status: 'completed',\n    files_cleaned: true,\n    completed_at: new Date().toISOString()\n  }\n};\"\n        }\n      },\n      {\n        \"name\": \"21. Final Success Log\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"http://localhost:3000/api/logs/success\",\n          \"method\": \"POST\",\n          \"bodyParametersUi\": {\n            \"parameter\": [\n              {\n                \"name\": \"video_id\",\n                \"value\": \"={{$json.videoId}}\"\n              },\n              {\n                \"name\": \"workflow_name\",\n                \"value\": \"tiktok-reposter-complete\"\n              },\n              {\n                \"name\": \"total_processing_time\",\n                \"value\": \"={{Date.now() - new Date($json.scraped_at).getTime()}}\"\n              },\n              {\n                \"name\": \"status\",\n                \"value\": \"success\"\n              },\n              {\n                \"name\": \"completed_at\",\n                \"value\": \"={{$json.completed_at}}\"\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"name\": \"Wait for Next Video\",\n        \"type\": \"n8n-nodes-base.wait\",\n        \"parameters\": {\n          \"amount\": 30,\n          \"unit\": \"seconds\"\n        }\n      },\n      {\n        \"name\": \"Schedule Later - Rate Limited\",\n        \"type\": \"n8n-nodes-base.httpRequest\",\n        \"parameters\": {\n          \"url\": \"http://localhost:3000/api/scheduled-posts\",\n          \"method\": \"POST\",\n          \"bodyParametersUi\": {\n            \"parameter\": [\n              {\n                \"name\": \"video_id\",\n                \"value\": \"={{$('9. Save to Database').item(0).json.video_id}}\"\n              },\n              {\n                \"name\": \"scheduled_time\",\n                \"value\": \"={{new Date(Date.now() + 3600000).toISOString()}}\"\n              },\n              {\n                \"name\": \"status\",\n                \"value\": \"queued\"\n              },\n              {\n                \"name\": \"reason\",\n                \"value\": \"rate_limited\"\n              }\n            ]\n          }\n        }\n      },\n      {\n        \"name\": \"Wait Until Scheduled Time\",\n        \"type\": \"n8n-nodes-base.wait\",\n        \"parameters\": {\n          \"amount\": 60,\n          \"unit\": \"minutes\"\n        }\n      },\n      {\n        \"name\": \"Error Handler\",\n        \"type\": \"n8n-nodes-base.code\",\n        \"parameters\": {\n          \"mode\": \"runOnceForEachItem\",\n          \"jsCode\": \"const error = $input.item(0).json;\nconst workflowName = 'tiktok-reposter-complete';\n\n// Log error details\nconst errorData = {\n  workflow: workflowName,\n  error: error.message || 'Unknown error',\n  timestamp: new Date().toISOString(),\n  video_id: error.videoId || 'unknown',\n  processing_step: error.processing_status || 'unknown'\n};\n\n// Send error notification\nconst emailResponse = await $http.request({\n  method: 'POST',\n  url: 'http://localhost:3000/api/email/error',\n  body: {\n    component: `n8n-${workflowName}`,\n    error: error.message,\n    details: JSON.stringify(errorData),\n    timestamp: errorData.timestamp\n  }\n});\n\n// Log to database\nconst logResponse = await $http.request({\n  method: 'POST',\n  url: 'http://localhost:3000/api/logs/error',\n  body: errorData\n});\n\nreturn { json: errorData };\"\n        }\n      }\n    ],\n    \"connections\": {\n      \"Start - Schedule Trigger\": {\n        \"main\": [[{\"node\": \"1. Get Active Sources\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"1. Get Active Sources\": {\n        \"main\": [[{\"node\": \"2. Process Each Source\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"2. Process Each Source\": {\n        \"main\": [[{\"node\": \"3. Scrape TikTok Content\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"3. Scrape TikTok Content\": {\n        \"main\": [[{\"node\": \"4. Filter New & Valid Videos\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"4. Filter New & Valid Videos\": {\n        \"main\": [[{\"node\": \"5. Download Video Files\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"5. Download Video Files\": {\n        \"main\": [[{\"node\": \"6. Process Video\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"6. Process Video\": {\n        \"main\": [[{\"node\": \"7. Generate Thumbnails\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"7. Generate Thumbnails\": {\n        \"main\": [[{\"node\": \"8. Upload to Azure Storage\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"8. Upload to Azure Storage\": {\n        \"main\": [[{\"node\": \"9. Save to Database\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"9. Save to Database\": {\n        \"main\": [[{\"node\": \"10. Generate Caption\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"10. Generate Caption\": {\n        \"main\": [[{\"node\": \"11. Schedule Post\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"11. Schedule Post\": {\n        \"main\": [[{\"node\": \"12. Check Posting Time\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"12. Check Posting Time\": {\n        \"main\": [\n          [{\"node\": \"13. TikTok Authentication\", \"type\": \"main\", \"index\": 0}],\n          [{\"node\": \"Wait Until Scheduled Time\", \"type\": \"main\", \"index\": 0}]\n        ]\n      },\n      \"13. TikTok Authentication\": {\n        \"main\": [[{\"node\": \"14. Check Rate Limits\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"14. Check Rate Limits\": {\n        \"main\": [[{\"node\": \"15. Rate Limit Check\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"15. Rate Limit Check\": {\n        \"main\": [\n          [{\"node\": \"16. Upload Video to TikTok\", \"type\": \"main\", \"index\": 0}],\n          [{\"node\": \"Schedule Later - Rate Limited\", \"type\": \"main\", \"index\": 0}]\n        ]\n      },\n      \"16. Upload Video to TikTok\": {\n        \"main\": [[{\"node\": \"17. Publish Video to TikTok\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"17. Publish Video to TikTok\": {\n        \"main\": [[{\"node\": \"18. Update Database - Posted\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"18. Update Database - Posted\": {\n        \"main\": [[{\"node\": \"19. Send Success Notification\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"19. Send Success Notification\": {\n        \"main\": [[{\"node\": \"20. Cleanup Local Files\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"20. Cleanup Local Files\": {\n        \"main\": [[{\"node\": \"21. Final Success Log\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"21. Final Success Log\": {\n        \"main\": [[{\"node\": \"Wait for Next Video\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"Wait Until Scheduled Time\": {\n        \"main\": [[{\"node\": \"13. TikTok Authentication\", \"type\": \"main\", \"index\": 0}]]\n      },\n      \"Schedule Later - Rate Limited\": {\n        \"main\": [[{\"node\": \"Wait Until Scheduled Time\", \"type\": \"main\", \"index\": 0}]]\n      }\n    }\n  }\n}\n```\n\n## 🔧 Configuration Requirements\n\n### Environment Variables\n\n```env\n# TikTok API\nTIKTOK_CLIENT_ID=your_tiktok_client_id\nTIKTOK_CLIENT_SECRET=your_tiktok_client_secret\nTIKTOK_AUTH_CODE=your_auth_code\n\n# Azure Storage\nAZURE_STORAGE_CONNECTION_STRING=your_connection_string\nAZURE_CONTAINER_NAME=tiktok-videos\n\n# Video Processing\nENABLE_WATERMARK_REMOVAL=true\nENABLE_QUALITY_ENHANCEMENT=true\nVIDEO_OUTPUT_QUALITY=720p\n\n# Captions\nCAPTION_METHOD=template\nCAPTION_TEMPLATE=🔥 Amazing content! {hashtags} #viral #trending\n\n# API Endpoints\nDASHBOARD_API_URL=http://localhost:3000\n\n# Email Notifications\nSMTP_HOST=smtp.gmail.com\nSMTP_PORT=587\nSMTP_USER=your_email@gmail.com\nSMTP_PASS=your_app_password\n```\n\n## 🚀 Key Features of Single Automation\n\n### ✅ **Complete End-to-End Flow**\n- Runs from content discovery to final posting\n- No stopping between steps\n- Handles multiple videos in sequence\n- Automatic error recovery and retry logic\n\n### ✅ **Intelligent Scheduling**\n- Optimal posting time calculation\n- Rate limit awareness\n- Automatic rescheduling when limits hit\n- Smart delays between operations\n\n### ✅ **Robust Processing Pipeline**\n- Multi-service video downloading\n- Video processing with FFmpeg\n- Thumbnail generation\n- Azure cloud storage\n- Database logging throughout\n\n### ✅ **Smart Content Management**\n- Duplicate video detection\n- Source-based filtering\n- AI-powered caption generation\n- Automatic file cleanup\n\n### ✅ **Comprehensive Monitoring**\n- Real-time status updates\n- Email notifications for success/errors\n- Database logging at each step\n- Performance metrics tracking\n\n## 📊 Workflow Execution Flow\n\n1. **Trigger** → Every 2 hours automatically\n2. **Discovery** → Scrape content from all active sources\n3. **Filtering** → Apply rules and check for duplicates\n4. **Download** → Get video files using multiple services\n5. **Processing** → Enhance quality, remove watermarks, generate thumbnails\n6. **Storage** → Upload to Azure Blob Storage\n7. **Database** → Save all metadata and URLs\n8. **Scheduling** → Calculate optimal posting time\n9. **Publishing** → Post to TikTok (if time is right)\n10. **Notifications** → Send success/error emails\n11. **Cleanup** → Remove temporary files\n12. **Loop** → Continue with next video\n\n## 🔄 Error Handling Strategy\n\n- **Automatic Retry**: Failed operations retry up to 3 times with exponential backoff\n- **Fallback Services**: Multiple download services ensure reliability\n- **Graceful Degradation**: Continue processing other videos if one fails\n- **Comprehensive Logging**: All errors logged with full context\n- **Email Alerts**: Immediate notification of critical failures\n\n## 🎯 Benefits of Single Workflow\n\n✅ **Simplified Management** - One workflow to rule them all\n✅ **Reduced Complexity** - No webhook dependencies between workflows  \n✅ **Better Performance** - No delays between workflow transitions\n✅ **Easier Debugging** - Single execution trace to follow\n✅ **Resource Efficiency** - Less overhead from multiple workflow management\n✅ **Atomic Operations** - Complete video processing in one execution\n\nThis single automation handles everything from content scraping to TikTok publishing in one continuous, uninterrupted flow!\n
+          "conditions": {
+            "options": [
+              {
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.can_post}}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "14. Upload Video to TikTok",
+        "type": "n8n-nodes-base.httpRequest",
+        "parameters": {
+          "url": "https://open-api.tiktok.com/share/video/upload/",
+          "method": "POST",
+          "sendBinaryData": true,
+          "binaryPropertyName": "processed_video",
+          "headers": {
+            "Authorization": "Bearer {{$('11. TikTok Authentication').item(0).json.access_token}}",
+            "Content-Type": "multipart/form-data"
+          },
+          "responseFormat": "json"
+        }
+      },
+      {
+        "name": "15. Publish Video to TikTok",
+        "type": "n8n-nodes-base.httpRequest",
+        "parameters": {
+          "url": "https://open-api.tiktok.com/share/video/publish/",
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$('11. TikTok Authentication').item(0).json.access_token}}",
+            "Content-Type": "application/json"
+          },
+          "bodyParametersUi": {
+            "parameter": [
+              {
+                "name": "media_id",
+                "value": "={{$('14. Upload Video to TikTok').item(0).json.media_id}}"
+              },
+              {
+                "name": "text",
+                "value": "={{$('10. Generate Caption').item(0).json.generated_caption}}"
+              },
+              {
+                "name": "privacy_level",
+                "value": "SELF_ONLY"
+              },
+              {
+                "name": "disable_duet",
+                "value": false
+              },
+              {
+                "name": "disable_comment",
+                "value": false
+              },
+              {
+                "name": "disable_stitch",
+                "value": false
+              }
+            ]
+          },
+          "responseFormat": "json"
+        }
+      },
+      {
+        "name": "16. Update Database - Posted",
+        "type": "n8n-nodes-base.httpRequest",
+        "parameters": {
+          "url": "http://localhost:3000/api/videos/{{$('9. Save to Database').item(0).json.video_id}}",
+          "method": "PUT",
+          "bodyParametersUi": {
+            "parameter": [
+              {
+                "name": "processing_status",
+                "value": "posted"
+              },
+              {
+                "name": "tiktok_post_id",
+                "value": "={{$json.share_id}}"
+              },
+              {
+                "name": "posted_at",
+                "value": "={{new Date().toISOString()}}"
+              },
+              {
+                "name": "generated_caption",
+                "value": "={{$('10. Generate Caption').item(0).json.generated_caption}}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "17. Send Success Notification",
+        "type": "n8n-nodes-base.httpRequest",
+        "parameters": {
+          "url": "http://localhost:3000/api/email/success",
+          "method": "POST",
+          "bodyParametersUi": {
+            "parameter": [
+              {
+                "name": "video_id",
+                "value": "={{$('9. Save to Database').item(0).json.video_id}}"
+              },
+              {
+                "name": "video_title",
+                "value": "={{$('10. Generate Caption').item(0).json.title}}"
+              },
+              {
+                "name": "author",
+                "value": "={{$('10. Generate Caption').item(0).json.author}}"
+              },
+              {
+                "name": "tiktok_post_id",
+                "value": "={{$('15. Publish Video to TikTok').item(0).json.share_id}}"
+              },
+              {
+                "name": "posted_at",
+                "value": "={{new Date().toISOString()}}"
+              },
+              {
+                "name": "caption",
+                "value": "={{$('10. Generate Caption').item(0).json.generated_caption}}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "18. Cleanup Local Files",
+        "type": "n8n-nodes-base.code",
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const fs = require('fs');\nconst video = $input.item(0).json;\n\n// Clean up processed video file\nif (video.processed_path && fs.existsSync(video.processed_path)) {\n  fs.unlinkSync(video.processed_path);\n}\n\n// Clean up thumbnail files\nif (video.thumbnails && Array.isArray(video.thumbnails)) {\n  video.thumbnails.forEach(thumbPath => {\n    if (fs.existsSync(thumbPath)) {\n      fs.unlinkSync(thumbPath);\n    }\n  });\n}\n\nreturn {\n  json: {\n    ...video,\n    processing_status: 'completed',\n    files_cleaned: true,\n    completed_at: new Date().toISOString()\n  }\n};"
+        }
+      },
+      {
+        "name": "19. Final Success Log",
+        "type": "n8n-nodes-base.httpRequest",
+        "parameters": {
+          "url": "http://localhost:3000/api/logs/success",
+          "method": "POST",
+          "bodyParametersUi": {
+            "parameter": [
+              {
+                "name": "video_id",
+                "value": "={{$json.videoId}}"
+              },
+              {
+                "name": "workflow_name",
+                "value": "tiktok-reposter-complete"
+              },
+              {
+                "name": "total_processing_time",
+                "value": "={{Date.now() - new Date($json.scraped_at).getTime()}}"
+              },
+              {
+                "name": "status",
+                "value": "success"
+              },
+              {
+                "name": "completed_at",
+                "value": "={{$json.completed_at}}"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "Wait for Next Video",
+        "type": "n8n-nodes-base.wait",
+        "parameters": {
+          "amount": 30,
+          "unit": "seconds"
+        }
+      },
+      {
+        "name": "Rate Limited - Skip Video",
+        "type": "n8n-nodes-base.code",
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const video = $input.item(0).json;\n\n// Log that video was skipped due to rate limits\nconst skipData = {\n  video_id: video.videoId,\n  reason: 'rate_limited',\n  skipped_at: new Date().toISOString(),\n  will_retry_next_cycle: true\n};\n\n// Log to database\nawait $http.request({\n  method: 'POST',\n  url: 'http://localhost:3000/api/logs/skipped',\n  body: skipData\n});\n\nreturn { json: { ...video, processing_status: 'skipped_rate_limited', ...skipData } };"
+        }
+      },
+      {
+        "name": "Error Handler",
+        "type": "n8n-nodes-base.code",
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "const error = $input.item(0).json;\nconst workflowName = 'tiktok-reposter-complete';\n\n// Log error details\nconst errorData = {\n  workflow: workflowName,\n  error: error.message || 'Unknown error',\n  timestamp: new Date().toISOString(),\n  video_id: error.videoId || 'unknown',\n  processing_step: error.processing_status || 'unknown'\n};\n\n// Send error notification\nconst emailResponse = await $http.request({\n  method: 'POST',\n  url: 'http://localhost:3000/api/email/error',\n  body: {\n    component: `n8n-${workflowName}`,\n    error: error.message,\n    details: JSON.stringify(errorData),\n    timestamp: errorData.timestamp\n  }\n});\n\n// Log to database\nconst logResponse = await $http.request({\n  method: 'POST',\n  url: 'http://localhost:3000/api/logs/error',\n  body: errorData\n});\n\nreturn { json: errorData };"
+        }
+      }
+    ],
+    "connections": {
+      "Start - Schedule Trigger": {
+        "main": [[{"node": "1. Get Active Sources", "type": "main", "index": 0}]]
+      },
+      "1. Get Active Sources": {
+        "main": [[{"node": "2. Process Each Source", "type": "main", "index": 0}]]
+      },
+      "2. Process Each Source": {
+        "main": [[{"node": "3. Scrape TikTok Content", "type": "main", "index": 0}]]
+      },
+      "3. Scrape TikTok Content": {
+        "main": [[{"node": "4. Filter New & Valid Videos", "type": "main", "index": 0}]]
+      },
+      "4. Filter New & Valid Videos": {
+        "main": [[{"node": "5. Download Video Files", "type": "main", "index": 0}]]
+      },
+      "5. Download Video Files": {
+        "main": [[{"node": "6. Process Video", "type": "main", "index": 0}]]
+      },
+      "6. Process Video": {
+        "main": [[{"node": "7. Generate Thumbnails", "type": "main", "index": 0}]]
+      },
+      "7. Generate Thumbnails": {
+        "main": [[{"node": "8. Upload to Azure Storage", "type": "main", "index": 0}]]
+      },
+      "8. Upload to Azure Storage": {
+        "main": [[{"node": "9. Save to Database", "type": "main", "index": 0}]]
+      },
+      "9. Save to Database": {
+        "main": [[{"node": "10. Generate Caption", "type": "main", "index": 0}]]
+      },
+      "10. Generate Caption": {
+        "main": [[{"node": "11. TikTok Authentication", "type": "main", "index": 0}]]
+      },
+      "11. TikTok Authentication": {
+        "main": [[{"node": "12. Check Rate Limits", "type": "main", "index": 0}]]
+      },
+      "12. Check Rate Limits": {
+        "main": [[{"node": "13. Rate Limit Check", "type": "main", "index": 0}]]
+      },
+      "13. Rate Limit Check": {
+        "main": [
+          [{"node": "14. Upload Video to TikTok", "type": "main", "index": 0}],
+          [{"node": "Rate Limited - Skip Video", "type": "main", "index": 0}]
+        ]
+      },
+      "14. Upload Video to TikTok": {
+        "main": [[{"node": "15. Publish Video to TikTok", "type": "main", "index": 0}]]
+      },
+      "15. Publish Video to TikTok": {
+        "main": [[{"node": "16. Update Database - Posted", "type": "main", "index": 0}]]
+      },
+      "16. Update Database - Posted": {
+        "main": [[{"node": "17. Send Success Notification", "type": "main", "index": 0}]]
+      },
+      "17. Send Success Notification": {
+        "main": [[{"node": "18. Cleanup Local Files", "type": "main", "index": 0}]]
+      },
+      "18. Cleanup Local Files": {
+        "main": [[{"node": "19. Final Success Log", "type": "main", "index": 0}]]
+      },
+      "19. Final Success Log": {
+        "main": [[{"node": "Wait for Next Video", "type": "main", "index": 0}]]
+      },
+      "Rate Limited - Skip Video": {
+        "main": [[{"node": "Wait for Next Video", "type": "main", "index": 0}]]
+      }
+    }
+  }
+}
+```
+
+## 🔧 Configuration Requirements
+
+### Environment Variables
+
+```env
+# TikTok API
+TIKTOK_CLIENT_ID=your_tiktok_client_id
+TIKTOK_CLIENT_SECRET=your_tiktok_client_secret
+TIKTOK_AUTH_CODE=your_auth_code
+
+# Azure Storage
+AZURE_STORAGE_CONNECTION_STRING=your_connection_string
+AZURE_CONTAINER_NAME=tiktok-videos
+
+# Video Processing
+ENABLE_WATERMARK_REMOVAL=true
+ENABLE_QUALITY_ENHANCEMENT=true
+VIDEO_OUTPUT_QUALITY=720p
+
+# Captions
+CAPTION_METHOD=template
+CAPTION_TEMPLATE=🔥 Amazing content! {hashtags} #viral #trending
+
+# API Endpoints
+DASHBOARD_API_URL=http://localhost:3000
+
+# Email Notifications
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+```
+
+## 🚀 Key Features of Single Automation
+
+### ✅ **Complete End-to-End Flow**
+- Runs from content discovery to final posting
+- No stopping between steps
+- Handles multiple videos in sequence
+- Automatic error recovery and retry logic
+
+### ✅ **Intelligent Scheduling**
+- Optimal posting time calculation
+- Rate limit awareness
+- Automatic rescheduling when limits hit
+- Smart delays between operations
+
+### ✅ **Robust Processing Pipeline**
+- Multi-service video downloading
+- Video processing with FFmpeg
+- Thumbnail generation
+- Azure cloud storage
+- Database logging throughout
+
+### ✅ **Smart Content Management**
+- Duplicate video detection
+- Source-based filtering
+- AI-powered caption generation
+- Automatic file cleanup
+
+### ✅ **Comprehensive Monitoring**
+- Real-time status updates
+- Email notifications for success/errors
+- Database logging at each step
+- Performance metrics tracking
+
+## 📊 Workflow Execution Flow
+
+1. **Trigger** → Every 2 hours automatically
+2. **Discovery** → Scrape content from all active sources
+3. **Filtering** → Apply rules and check for duplicates
+4. **Download** → Get video files using multiple services
+5. **Processing** → Enhance quality, remove watermarks, generate thumbnails
+6. **Storage** → Upload to Azure Blob Storage
+7. **Database** → Save all metadata and URLs
+8. **Scheduling** → Calculate optimal posting time
+9. **Publishing** → Post to TikTok (if time is right)
+10. **Notifications** → Send success/error emails
+11. **Cleanup** → Remove temporary files
+12. **Loop** → Continue with next video
+
+## 🔄 Error Handling Strategy
+
+- **Automatic Retry**: Failed operations retry up to 3 times with exponential backoff
+- **Fallback Services**: Multiple download services ensure reliability
+- **Graceful Degradation**: Continue processing other videos if one fails
+- **Comprehensive Logging**: All errors logged with full context
+- **Email Alerts**: Immediate notification of critical failures
+
+## 🎯 Benefits of Single Workflow
+
+✅ **Simplified Management** - One workflow to rule them all
+✅ **Reduced Complexity** - No webhook dependencies between workflows 
+✅ **Better Performance** - No delays between workflow transitions
+✅ **Easier Debugging** - Single execution trace to follow
+✅ **Resource Efficiency** - Less overhead from multiple workflow management
+✅ **Atomic Operations** - Complete video processing in one execution
+
+## 🛠️ Technology Stack & Dependencies
+
+This project requires a comprehensive technology stack to handle video processing, storage, APIs, and automation. Here's everything you'll need:
+
+### 🖥️ **Core Technologies**
+
+#### **Frontend Dashboard**
+- **HTML5** - Semantic markup and structure
+- **Tailwind CSS** - Utility-first styling framework
+- **Vanilla JavaScript** - Interactive functionality and API calls
+- **Lucide Icons** - Modern icon library
+
+#### **Backend Services**
+- **Node.js 18+** - JavaScript runtime environment
+- **Express.js** - Web application framework
+- **SQLite** - Local database for metadata
+- **Winston** - Logging and monitoring
+
+#### **Automation Engine**
+- **n8n** - Workflow automation platform (self-hosted)
+- **Docker** (optional) - For containerized n8n deployment
+
+### 📦 **Required Dependencies**
+
+#### **Node.js Packages** (package.json)
+```json
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "puppeteer": "^21.5.2",
+    "axios": "^1.6.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "ffmpeg-static": "^5.2.0",
+    "sharp": "^0.32.6",
+    "@azure/storage-blob": "^12.17.0",
+    "nodemailer": "^6.9.7",
+    "node-cron": "^3.0.3",
+    "ws": "^8.14.2",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1",
+    "crypto-js": "^4.2.0"
+  }
+}
+```
+
+#### **System Dependencies**
+- **FFmpeg** - Video processing and manipulation
+  ```bash
+  # macOS
+  brew install ffmpeg
+  
+  # Ubuntu/Debian
+  sudo apt update && sudo apt install ffmpeg
+  
+  # Windows
+  # Download from https://ffmpeg.org/
+  ```
+
+- **Chromium/Chrome** - Required for Puppeteer web scraping
+  ```bash
+  # Usually installed automatically with Puppeteer
+  # Manual installation if needed:
+  sudo apt install chromium-browser  # Linux
+  ```
+
+### 🌐 **External Services & APIs**
+
+#### **TikTok Integration**
+- **TikTok Business API** - For posting videos
+  - Client ID and Client Secret
+  - OAuth 2.0 authentication flow
+  - API rate limits: 100 requests/day
+- **TikTok Web Interface** - For content scraping via Puppeteer
+
+#### **Video Download Services**
+- **SSSTik** (Primary) - `https://ssstik.io/`
+- **TikMate** (Secondary) - `https://tikmate.online/`  
+- **SnapTik** (Fallback) - `https://snaptik.app/`
+
+#### **Cloud Storage**
+- **Azure Blob Storage**
+  - Storage account and container
+  - Connection string
+  - Lifecycle management (7-day retention)
+
+#### **Email Notifications**
+- **SMTP Server** (Gmail recommended)
+  - SMTP host and port
+  - Authentication credentials
+  - App-specific passwords for Gmail
+
+### 🔧 **Development Tools**
+
+#### **Code Quality**
+- **ESLint** - JavaScript linting
+- **Prettier** - Code formatting
+- **Nodemon** - Development server auto-restart
+
+#### **Testing**
+- **Jest** - Unit and integration testing
+- **Supertest** - API endpoint testing
+
+### 🐳 **Deployment Options**
+
+#### **Local Development**
+```bash
+# Install Node.js dependencies
+npm install
+
+# Install system dependencies
+brew install ffmpeg  # macOS
+sudo apt install ffmpeg  # Ubuntu
+
+# Start services
+npm run dev
+```
+
+#### **Docker Deployment** (Recommended for n8n)
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+    volumes:
+      - ./n8n/data:/data
+      - ./storage:/storage
+    
+  dashboard:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./storage:/app/storage
+```
+
+### 💾 **Storage Requirements**
+
+#### **Local Storage**
+- **Minimum**: 10GB free space
+- **Recommended**: 50GB+ for video processing
+- **Temporary Space**: 5GB for processing pipeline
+
+#### **Azure Blob Storage**
+- **Container**: For video backup
+- **Lifecycle Policy**: 7-day automatic deletion
+- **Estimated Cost**: $5-20/month depending on volume
+
+### 🔐 **Security Requirements**
+
+#### **API Keys & Secrets**
+- TikTok Client ID/Secret
+- Azure Storage connection string
+- SMTP authentication credentials
+- JWT secrets for dashboard authentication
+
+#### **Environment Variables**
+```env
+# Core Configuration
+PORT=3000
+NODE_ENV=production
+
+# TikTok API
+TIKTOK_CLIENT_ID=your_client_id
+TIKTOK_CLIENT_SECRET=your_client_secret
+
+# Azure Storage
+AZURE_STORAGE_CONNECTION_STRING=your_connection
+
+# Email SMTP
+SMTP_HOST=smtp.gmail.com
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+
+# Processing
+ENABLE_WATERMARK_REMOVAL=true
+VIDEO_OUTPUT_QUALITY=720p
+```
+
+### 📊 **Performance Requirements**
+
+#### **Minimum System Specs**
+- **CPU**: 4 cores (video processing intensive)
+- **RAM**: 8GB (Puppeteer + FFmpeg + n8n)
+- **Storage**: 50GB SSD
+- **Network**: Stable broadband (video downloads)
+
+#### **Recommended System Specs**
+- **CPU**: 8+ cores
+- **RAM**: 16GB+
+- **Storage**: 100GB+ NVMe SSD
+- **Network**: High-speed broadband
+
+### 🚀 **Installation Process**
+
+1. **System Setup**
+   ```bash
+   # Install Node.js 18+
+   # Install FFmpeg
+   # Install Docker (optional)
+   ```
+
+2. **Project Setup**
+   ```bash
+   git clone <repository>
+   cd TikTok-Reposter
+   npm install
+   ```
+
+3. **Configuration**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your credentials
+   ```
+
+4. **Service Startup**
+   ```bash
+   # Start dashboard
+   npm run dev
+   
+   # Start n8n (separate terminal)
+   npx n8n start
+   ```
+
+5. **Import Workflow**
+   - Open n8n at `http://localhost:5678`
+   - Import the workflow JSON from this document
+   - Configure environment variables in n8n
+
+### ⚠️ **Important Notes**
+
+- **Legal Compliance**: Ensure compliance with TikTok ToS and copyright laws
+- **Rate Limiting**: Respect API limits to avoid account suspension
+- **Content Rights**: Only repost content you have permission to use
+- **Resource Usage**: Video processing is CPU/RAM intensive
+- **Storage Management**: Monitor disk space usage regularly
+
+This comprehensive technology stack ensures reliable, scalable TikTok content automation with proper monitoring and error handling.
+
+---
+
+This single automation handles everything from content scraping to immediate TikTok publishing in one continuous, uninterrupted flow!
